@@ -1,0 +1,1572 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Vedafácil">
+  <meta name="theme-color" content="#1a5c9a">
+  <title>Vedafácil Medidor</title>
+  <link rel="manifest" href="./manifest.json">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #1a5c9a;
+      --primary-dark: #124272;
+      --primary-light: #e8f1f9;
+      --success: #2e7d32;
+      --success-light: #e8f5e9;
+      --danger: #c62828;
+      --danger-light: #ffebee;
+      --warning: #f57c00;
+      --warning-light: #fff3e0;
+      --info: #0277bd;
+      --info-light: #e1f5fe;
+      --gray-50: #fafafa;
+      --gray-100: #f5f5f5;
+      --gray-200: #eeeeee;
+      --gray-300: #e0e0e0;
+      --gray-400: #bdbdbd;
+      --gray-500: #9e9e9e;
+      --gray-600: #757575;
+      --gray-700: #616161;
+      --gray-800: #424242;
+      --gray-900: #212121;
+      --radius: 12px;
+      --shadow: 0 2px 8px rgba(0,0,0,0.1);
+      --shadow-lg: 0 4px 16px rgba(0,0,0,0.15);
+    }
+
+    html, body {
+      height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--gray-100);
+      color: var(--gray-900);
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    /* ── Screens ── */
+    .screen { display: none; min-height: 100vh; }
+    .screen.active { display: flex; flex-direction: column; }
+
+    /* ── Login ── */
+    #screen-login {
+      background: linear-gradient(160deg, var(--primary) 0%, var(--primary-dark) 100%);
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .login-box {
+      width: 100%;
+      max-width: 360px;
+      text-align: center;
+    }
+    .login-logo {
+      width: 80px;
+      height: 80px;
+      background: white;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      font-size: 48px;
+      font-weight: 900;
+      color: var(--primary);
+      box-shadow: var(--shadow-lg);
+    }
+    .login-title {
+      color: white;
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      letter-spacing: -0.5px;
+    }
+    .login-subtitle {
+      color: rgba(255,255,255,0.75);
+      font-size: 15px;
+      margin-bottom: 40px;
+    }
+    .login-btn {
+      display: block;
+      width: 100%;
+      padding: 18px;
+      margin-bottom: 12px;
+      background: white;
+      color: var(--primary);
+      border: none;
+      border-radius: var(--radius);
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: transform 0.1s, box-shadow 0.1s;
+      min-height: 60px;
+    }
+    .login-btn:active { transform: scale(0.98); box-shadow: none; }
+
+    /* ── Home ── */
+    #screen-home { background: var(--gray-100); }
+
+    .home-header {
+      background: var(--primary);
+      color: white;
+      padding: 20px 16px 16px;
+    }
+    .home-header-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .home-greeting { font-size: 22px; font-weight: 700; }
+    .home-date { font-size: 13px; color: rgba(255,255,255,0.75); margin-top: 2px; }
+    .badge-online {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(255,255,255,0.2);
+      color: white;
+      white-space: nowrap;
+    }
+    .badge-online .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #4caf50;
+    }
+    .badge-online.offline .dot { background: #ff9800; }
+
+    .home-body { padding: 16px; flex: 1; overflow-y: auto; }
+
+    .pending-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--warning-light);
+      color: var(--warning);
+      border: 1px solid #ffe0b2;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      width: 100%;
+    }
+    .pending-badge .count {
+      background: var(--warning);
+      color: white;
+      border-radius: 12px;
+      padding: 1px 8px;
+      font-size: 13px;
+    }
+    .pending-badge.none { background: var(--success-light); color: var(--success); border-color: #c8e6c9; }
+    .pending-badge.none .count { background: var(--success); }
+
+    .btn-new {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 18px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+      min-height: 60px;
+      transition: background 0.15s;
+    }
+    .btn-new:active { background: var(--primary-dark); }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--gray-600);
+      margin-bottom: 10px;
+    }
+
+    .measurement-card {
+      background: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px;
+      margin-bottom: 10px;
+    }
+    .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+    .card-client { font-weight: 700; font-size: 15px; color: var(--gray-900); }
+    .card-date { font-size: 12px; color: var(--gray-500); }
+    .status-badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .status-draft { background: var(--gray-200); color: var(--gray-700); }
+    .status-pending { background: var(--warning-light); color: var(--warning); }
+    .status-sent { background: var(--success-light); color: var(--success); }
+    .card-city { font-size: 13px; color: var(--gray-600); margin: 4px 0 10px; }
+    .card-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn-sm {
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      min-height: 36px;
+      transition: opacity 0.15s;
+    }
+    .btn-sm:active { opacity: 0.7; }
+    .btn-send { background: var(--primary); color: white; }
+    .btn-edit { background: var(--gray-100); color: var(--gray-800); border: 1px solid var(--gray-300); }
+    .btn-delete { background: var(--danger-light); color: var(--danger); }
+
+    .empty-state { text-align: center; color: var(--gray-500); font-size: 14px; padding: 16px 0; }
+
+    .logout-link {
+      display: block;
+      text-align: center;
+      color: var(--gray-500);
+      font-size: 14px;
+      padding: 20px 0 8px;
+      cursor: pointer;
+      text-decoration: underline;
+      background: none;
+      border: none;
+    }
+
+    /* ── Form ── */
+    #screen-form { background: var(--gray-100); }
+
+    .form-header {
+      background: var(--primary);
+      color: white;
+      padding: 16px;
+    }
+    .form-title { font-size: 18px; font-weight: 700; margin-bottom: 12px; }
+    .progress-bar-wrap {
+      background: rgba(255,255,255,0.3);
+      border-radius: 4px;
+      height: 6px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: white;
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+    .step-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 6px;
+    }
+    .step-label {
+      font-size: 11px;
+      color: rgba(255,255,255,0.6);
+      font-weight: 500;
+    }
+    .step-label.active { color: white; font-weight: 700; }
+
+    .form-body { padding: 16px; flex: 1; overflow-y: auto; }
+
+    .form-step { display: none; }
+    .form-step.active { display: block; }
+
+    .form-group { margin-bottom: 16px; }
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray-700);
+      margin-bottom: 6px;
+    }
+    .form-label .req { color: var(--danger); margin-left: 2px; }
+    .form-input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid var(--gray-300);
+      border-radius: 8px;
+      font-size: 16px;
+      color: var(--gray-900);
+      background: white;
+      outline: none;
+      transition: border-color 0.15s;
+      -webkit-appearance: none;
+    }
+    .form-input:focus { border-color: var(--primary); }
+    .form-input.error { border-color: var(--danger); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    /* Step 2 - Locations */
+    .location-card {
+      background: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+    .location-card-header {
+      background: var(--primary-light);
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .location-num {
+      background: var(--primary);
+      color: white;
+      border-radius: 50%;
+      width: 26px;
+      height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .location-name-input {
+      flex: 1;
+      padding: 8px 10px;
+      border: 1.5px solid var(--gray-300);
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--gray-900);
+      outline: none;
+      background: white;
+    }
+    .location-name-input:focus { border-color: var(--primary); }
+    .btn-remove-location {
+      background: var(--danger-light);
+      color: var(--danger);
+      border: none;
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 16px;
+      cursor: pointer;
+      line-height: 1;
+      min-width: 36px;
+      min-height: 36px;
+    }
+
+    .location-fields {
+      padding: 12px 14px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .field-group { display: flex; flex-direction: column; gap: 4px; }
+    .field-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gray-600);
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .inputs-container { display: flex; flex-direction: column; gap: 4px; }
+    .input-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .measure-input {
+      flex: 1;
+      min-width: 0;
+      padding: 8px 8px;
+      border: 1.5px solid var(--gray-300);
+      border-radius: 6px;
+      font-size: 15px;
+      text-align: right;
+      color: var(--gray-900);
+      outline: none;
+      background: white;
+      -webkit-appearance: none;
+    }
+    .measure-input:focus { border-color: var(--primary); }
+    .btn-add-input {
+      background: var(--primary-light);
+      color: var(--primary);
+      border: 1px solid var(--primary);
+      border-radius: 6px;
+      width: 30px;
+      height: 34px;
+      font-size: 18px;
+      line-height: 1;
+      cursor: pointer;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-remove-input {
+      background: var(--danger-light);
+      color: var(--danger);
+      border: 1px solid #ffcdd2;
+      border-radius: 6px;
+      width: 30px;
+      height: 34px;
+      font-size: 16px;
+      line-height: 1;
+      cursor: pointer;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-remove-input:disabled { opacity: 0.3; cursor: default; }
+    .field-total {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--primary);
+      text-align: right;
+    }
+
+    .btn-add-location {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 14px;
+      background: white;
+      color: var(--primary);
+      border: 2px dashed var(--primary);
+      border-radius: var(--radius);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 16px;
+      min-height: 52px;
+    }
+
+    /* Step 3 - Photos */
+    .photo-location-input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid var(--gray-300);
+      border-radius: 8px;
+      font-size: 16px;
+      outline: none;
+      margin-bottom: 12px;
+      background: white;
+    }
+    .photo-location-input:focus { border-color: var(--primary); }
+
+    .btn-add-photo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 16px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 16px;
+      min-height: 52px;
+    }
+    #photo-file-input { display: none; }
+
+    .photos-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .photo-thumb {
+      position: relative;
+      border-radius: 10px;
+      overflow: hidden;
+      aspect-ratio: 4/3;
+      background: var(--gray-200);
+      box-shadow: var(--shadow);
+    }
+    .photo-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .photo-label-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(transparent, rgba(0,0,0,0.7));
+      color: white;
+      padding: 16px 8px 6px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .btn-remove-photo {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      background: rgba(0,0,0,0.6);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 26px;
+      height: 26px;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+    .photos-empty { text-align: center; color: var(--gray-500); padding: 20px; font-size: 14px; }
+
+    /* Step 4 - Summary */
+    .summary-card {
+      background: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    .summary-title { font-size: 14px; font-weight: 700; color: var(--gray-600); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.3px; }
+    .summary-row { display: flex; justify-content: space-between; align-items: baseline; padding: 5px 0; border-bottom: 1px solid var(--gray-100); }
+    .summary-row:last-child { border-bottom: none; }
+    .summary-row-label { font-size: 14px; color: var(--gray-600); }
+    .summary-row-value { font-size: 15px; font-weight: 700; color: var(--gray-900); }
+    .summary-total-row { background: var(--primary-light); border-radius: 8px; padding: 8px 10px; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
+    .summary-total-label { font-size: 14px; color: var(--primary); font-weight: 600; }
+    .summary-total-value { font-size: 16px; font-weight: 800; color: var(--primary); }
+
+    /* Form footer */
+    .form-footer {
+      background: white;
+      border-top: 1px solid var(--gray-200);
+      padding: 12px 16px;
+      display: flex;
+      gap: 10px;
+    }
+    .btn-back {
+      flex: 1;
+      padding: 14px;
+      background: white;
+      color: var(--gray-700);
+      border: 1.5px solid var(--gray-300);
+      border-radius: var(--radius);
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      min-height: 52px;
+    }
+    .btn-next {
+      flex: 2;
+      padding: 14px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      min-height: 52px;
+      transition: background 0.15s;
+    }
+    .btn-next:active { background: var(--primary-dark); }
+    .btn-draft {
+      flex: 1;
+      padding: 14px;
+      background: var(--gray-100);
+      color: var(--gray-800);
+      border: 1.5px solid var(--gray-300);
+      border-radius: var(--radius);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      min-height: 52px;
+    }
+    .btn-submit {
+      flex: 2;
+      padding: 14px;
+      background: var(--success);
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      min-height: 52px;
+    }
+
+    /* ── Toast ── */
+    #toast-container {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      pointer-events: none;
+      width: calc(100% - 32px);
+      max-width: 360px;
+    }
+    .toast {
+      padding: 13px 18px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      color: white;
+      box-shadow: var(--shadow-lg);
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.25s, transform 0.25s;
+      width: 100%;
+      text-align: center;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.success { background: var(--success); }
+    .toast.error { background: var(--danger); }
+    .toast.info { background: var(--info); }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════
+     SCREEN 1: LOGIN
+══════════════════════════════════════════════ -->
+<div id="screen-login" class="screen">
+  <div class="login-box">
+    <div class="login-logo">V</div>
+    <div class="login-title">Vedafácil</div>
+    <div class="login-subtitle">Selecione seu nome para continuar</div>
+    <button class="login-btn" onclick="doLogin('Edson')">Edson</button>
+    <button class="login-btn" onclick="doLogin('Fernando')">Fernando</button>
+    <button class="login-btn" onclick="doLogin('Alan')">Alan</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SCREEN 2: HOME
+══════════════════════════════════════════════ -->
+<div id="screen-home" class="screen">
+  <div class="home-header">
+    <div class="home-header-top">
+      <div>
+        <div class="home-greeting" id="home-greeting">Olá, Edson</div>
+        <div class="home-date" id="home-date"></div>
+      </div>
+      <div class="badge-online" id="online-badge">
+        <span class="dot"></span>
+        <span id="online-text">Online</span>
+      </div>
+    </div>
+  </div>
+  <div class="home-body">
+    <div class="pending-badge" id="pending-badge">
+      <span>Medições pendentes</span>
+      <span class="count" id="pending-count">0</span>
+    </div>
+
+    <button class="btn-new" onclick="startNewMeasurement()">
+      <span style="font-size:22px; line-height:1;">+</span> Nova Medição
+    </button>
+
+    <div class="section-title">Pendentes de envio</div>
+    <div id="list-pending"></div>
+
+    <div class="section-title" style="margin-top:8px;">Enviadas hoje</div>
+    <div id="list-sent"></div>
+
+    <button class="logout-link" onclick="doLogout()">Sair (trocar usuário)</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SCREEN 3-6: FORM
+══════════════════════════════════════════════ -->
+<div id="screen-form" class="screen">
+  <div class="form-header">
+    <div class="form-title" id="form-step-title">Dados do cliente</div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progress-fill" style="width:25%"></div>
+    </div>
+    <div class="step-labels">
+      <span class="step-label active" id="slabel-1">1. Cliente</span>
+      <span class="step-label" id="slabel-2">2. Locais</span>
+      <span class="step-label" id="slabel-3">3. Fotos</span>
+      <span class="step-label" id="slabel-4">4. Resumo</span>
+    </div>
+  </div>
+
+  <div class="form-body">
+
+    <!-- STEP 1: Client data -->
+    <div class="form-step active" id="step-1">
+      <div class="form-group">
+        <label class="form-label">Nome do cliente <span class="req">*</span></label>
+        <input class="form-input" id="f-cliente" type="text" placeholder="Ex: Condomínio Solar">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Endereço</label>
+        <input class="form-input" id="f-endereco" type="text" placeholder="Rua, número">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Cidade <span class="req">*</span></label>
+          <input class="form-input" id="f-cidade" type="text" placeholder="Cidade">
+        </div>
+        <div class="form-group">
+          <label class="form-label">CEP</label>
+          <input class="form-input" id="f-cep" type="text" placeholder="00000-000" inputmode="numeric">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">AC</label>
+          <input class="form-input" id="f-ac" type="text" placeholder="AC">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Celular</label>
+          <input class="form-input" id="f-celular" type="tel" placeholder="(00) 00000-0000">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Observações</label>
+        <textarea class="form-input" id="f-obs" rows="3" placeholder="Observações gerais..." style="resize:vertical;"></textarea>
+      </div>
+    </div>
+
+    <!-- STEP 2: Locations -->
+    <div class="form-step" id="step-2">
+      <div id="locations-list"></div>
+      <button class="btn-add-location" onclick="addLocation()">
+        <span style="font-size:20px;">+</span> Adicionar local
+      </button>
+    </div>
+
+    <!-- STEP 3: Photos -->
+    <div class="form-step" id="step-3">
+      <div class="form-group">
+        <label class="form-label">Nome do local desta foto</label>
+        <input class="photo-location-input" id="photo-location-name" type="text" placeholder="Ex: Telhado, Garagem...">
+      </div>
+      <button class="btn-add-photo" onclick="document.getElementById('photo-file-input').click()">
+        📷 Adicionar Foto
+      </button>
+      <input type="file" id="photo-file-input" accept="image/*" capture="environment" multiple>
+      <div class="photos-grid" id="photos-grid"></div>
+      <div class="photos-empty" id="photos-empty">Nenhuma foto adicionada ainda.</div>
+    </div>
+
+    <!-- STEP 4: Summary -->
+    <div class="form-step" id="step-4">
+      <div class="summary-card">
+        <div class="summary-title">Dados do cliente</div>
+        <div class="summary-row"><span class="summary-row-label">Cliente</span><span class="summary-row-value" id="sum-cliente">—</span></div>
+        <div class="summary-row"><span class="summary-row-label">Medidor</span><span class="summary-row-value" id="sum-user">—</span></div>
+        <div class="summary-row"><span class="summary-row-label">Cidade</span><span class="summary-row-value" id="sum-cidade">—</span></div>
+        <div class="summary-row"><span class="summary-row-label">Data</span><span class="summary-row-value" id="sum-date">—</span></div>
+        <div class="summary-row"><span class="summary-row-label">Locais</span><span class="summary-row-value" id="sum-locais">—</span></div>
+        <div class="summary-row"><span class="summary-row-label">Fotos</span><span class="summary-row-value" id="sum-fotos">—</span></div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-title">Totais por serviço</div>
+        <div id="summary-totals"></div>
+      </div>
+    </div>
+
+  </div><!-- /form-body -->
+
+  <div class="form-footer" id="form-footer">
+    <button class="btn-back" id="btn-back" onclick="goBack()">← Voltar</button>
+    <button class="btn-next" id="btn-next" onclick="goNext()">Próximo →</button>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+<script>
+// ══════════════════════════════════════════════
+// CONSTANTS
+// ══════════════════════════════════════════════
+const WEBHOOK_URL = 'CONFIGURE_WEBHOOK_URL_HERE';
+
+const SERVICE_TYPES = [
+  { key: 'trinca',     label: 'Trincas',              unit: 'm'   },
+  { key: 'juntaFria',  label: 'Juntas Frias',         unit: 'm'   },
+  { key: 'ralo',       label: 'Ralos',                unit: 'unid'},
+  { key: 'juntaDilat', label: 'Juntas de Dilatação',  unit: 'm'   },
+  { key: 'ferragem',   label: 'Tratam. de Ferragens',  unit: 'm'   },
+  { key: 'cortina',    label: 'Cortinas',             unit: 'm²'  }
+];
+
+// ══════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════
+let currentUser = null;
+let currentStep = 1;
+let currentMeasurement = null; // measurement being edited/created
+
+// ══════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════
+function genId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
+
+function formatDate(ts) {
+  const d = new Date(ts);
+  return d.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric' });
+}
+
+function formatDateFull(ts) {
+  const d = new Date(ts);
+  return d.toLocaleDateString('pt-BR', { weekday:'long', day:'2-digit', month:'long', year:'numeric' });
+}
+
+function sum(arr) {
+  return arr.reduce((a, b) => a + (parseFloat(b) || 0), 0);
+}
+
+// ══════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════
+function showToast(msg, type = 'info') {
+  const container = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.textContent = msg;
+  container.appendChild(t);
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => t.classList.add('show'));
+  });
+  setTimeout(() => {
+    t.classList.remove('show');
+    setTimeout(() => t.remove(), 300);
+  }, 3000);
+}
+
+// ══════════════════════════════════════════════
+// SCREENS
+// ══════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ══════════════════════════════════════════════
+// AUTH
+// ══════════════════════════════════════════════
+function doLogin(name) {
+  const expiresAt = Date.now() + 8 * 60 * 60 * 1000;
+  localStorage.setItem('vf_user', JSON.stringify({ name, expiresAt }));
+  currentUser = name;
+  showHome();
+}
+
+function doLogout() {
+  localStorage.removeItem('vf_user');
+  currentUser = null;
+  showScreen('login');
+}
+
+function checkSession() {
+  const raw = localStorage.getItem('vf_user');
+  if (!raw) return false;
+  try {
+    const s = JSON.parse(raw);
+    if (Date.now() > s.expiresAt) { localStorage.removeItem('vf_user'); return false; }
+    currentUser = s.name;
+    return true;
+  } catch { return false; }
+}
+
+// ══════════════════════════════════════════════
+// MEASUREMENTS - STORAGE
+// ══════════════════════════════════════════════
+function getMeasurements() {
+  try { return JSON.parse(localStorage.getItem('vf_measurements') || '[]'); } catch { return []; }
+}
+
+function saveMeasurements(arr) {
+  localStorage.setItem('vf_measurements', JSON.stringify(arr));
+}
+
+function upsertMeasurement(m) {
+  const arr = getMeasurements();
+  const idx = arr.findIndex(x => x.id === m.id);
+  if (idx >= 0) arr[idx] = m; else arr.unshift(m);
+  saveMeasurements(arr);
+}
+
+function deleteMeasurement(id) {
+  saveMeasurements(getMeasurements().filter(x => x.id !== id));
+  renderHome();
+  showToast('Medição excluída.', 'info');
+}
+
+// ══════════════════════════════════════════════
+// HOME
+// ══════════════════════════════════════════════
+function showHome() {
+  document.getElementById('home-greeting').textContent = `Olá, ${currentUser}`;
+  document.getElementById('home-date').textContent = formatDateFull(Date.now());
+  updateOnlineBadge();
+  renderHome();
+  showScreen('home');
+}
+
+function renderHome() {
+  const all = getMeasurements();
+  const pending = all.filter(m => m.status === 'draft' || m.status === 'pending');
+  const todayStart = new Date(); todayStart.setHours(0,0,0,0);
+  const sent = all.filter(m => m.status === 'sent' && m.createdAt >= todayStart.getTime());
+
+  // Pending badge
+  const badge = document.getElementById('pending-badge');
+  document.getElementById('pending-count').textContent = pending.length;
+  badge.className = 'pending-badge' + (pending.length === 0 ? ' none' : '');
+
+  // Pending list
+  const listPending = document.getElementById('list-pending');
+  if (pending.length === 0) {
+    listPending.innerHTML = '<div class="empty-state">Nenhuma pendente</div>';
+  } else {
+    listPending.innerHTML = pending.map(m => renderMeasurementCard(m)).join('');
+  }
+
+  // Sent today list
+  const listSent = document.getElementById('list-sent');
+  if (sent.length === 0) {
+    listSent.innerHTML = '<div class="empty-state">Nenhuma enviada hoje</div>';
+  } else {
+    listSent.innerHTML = sent.map(m => renderMeasurementCard(m)).join('');
+  }
+}
+
+function renderMeasurementCard(m) {
+  const statusLabels = { draft: 'Rascunho', pending: 'Aguardando envio', sent: 'Enviada' };
+  const statusClass = { draft: 'status-draft', pending: 'status-pending', sent: 'status-sent' };
+  const canSend = m.status === 'pending' || m.status === 'draft';
+  const canEdit = m.status !== 'sent';
+  return `
+    <div class="measurement-card">
+      <div class="card-header">
+        <div class="card-client">${escHtml(m.cliente || 'Sem cliente')}</div>
+        <span class="status-badge ${statusClass[m.status] || 'status-draft'}">${statusLabels[m.status] || m.status}</span>
+      </div>
+      <div class="card-city">${escHtml(m.cidade || '')} · ${formatDate(m.createdAt)}</div>
+      <div class="card-actions">
+        ${canSend ? `<button class="btn-sm btn-send" onclick="sendNow('${m.id}')">Enviar agora</button>` : ''}
+        ${canEdit ? `<button class="btn-sm btn-edit" onclick="editMeasurement('${m.id}')">Editar</button>` : ''}
+        <button class="btn-sm btn-delete" onclick="confirmDelete('${m.id}')">Excluir</button>
+      </div>
+    </div>`;
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function confirmDelete(id) {
+  if (confirm('Excluir esta medição?')) deleteMeasurement(id);
+}
+
+// ══════════════════════════════════════════════
+// ONLINE / OFFLINE
+// ══════════════════════════════════════════════
+function updateOnlineBadge() {
+  const badge = document.getElementById('online-badge');
+  const text = document.getElementById('online-text');
+  if (navigator.onLine) {
+    badge.classList.remove('offline');
+    text.textContent = 'Online';
+    badge.querySelector('.dot').style.background = '#4caf50';
+  } else {
+    badge.classList.add('offline');
+    text.textContent = 'Offline';
+    badge.querySelector('.dot').style.background = '#ff9800';
+  }
+}
+
+window.addEventListener('online', () => { updateOnlineBadge(); syncPendingMeasurements(); });
+window.addEventListener('offline', () => { updateOnlineBadge(); });
+
+// ══════════════════════════════════════════════
+// SEND / SYNC
+// ══════════════════════════════════════════════
+async function sendMeasurement(measurement) {
+  const payload = {
+    id: measurement.id,
+    user: measurement.user,
+    createdAt: measurement.createdAt,
+    cliente: measurement.cliente,
+    endereco: measurement.endereco,
+    cidade: measurement.cidade,
+    cep: measurement.cep,
+    ac: measurement.ac,
+    celular: measurement.celular,
+    obs: measurement.obs,
+    locais: measurement.locais.map(l => ({
+      nome: l.nome,
+      trinca: l.trinca,
+      trincaDetalhe: l.trincaDetalhe,
+      juntaFria: l.juntaFria,
+      juntaFriaDetalhe: l.juntaFriaDetalhe,
+      ralo: l.ralo,
+      raloDetalhe: l.raloDetalhe,
+      juntaDilat: l.juntaDilat,
+      juntaDilatDetalhe: l.juntaDilatDetalhe,
+      ferragem: l.ferragem,
+      ferragemDetalhe: l.ferragemDetalhe,
+      cortina: l.cortina,
+      cortinaDetalhe: l.cortinaDetalhe
+    })),
+    fotos: measurement.fotos
+  };
+  const response = await fetch(WEBHOOK_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  return response.ok;
+}
+
+async function sendNow(id) {
+  const arr = getMeasurements();
+  const m = arr.find(x => x.id === id);
+  if (!m) return;
+  if (!navigator.onLine) { showToast('Sem conexão. A medição será enviada quando voltar online.', 'info'); m.status = 'pending'; upsertMeasurement(m); renderHome(); return; }
+  try {
+    const ok = await sendMeasurement(m);
+    if (ok) {
+      m.status = 'sent';
+      upsertMeasurement(m);
+      showToast('Medição enviada com sucesso!', 'success');
+    } else {
+      showToast('Erro ao enviar. Tente novamente.', 'error');
+    }
+  } catch {
+    showToast('Erro de conexão. Salvando como pendente.', 'error');
+    m.status = 'pending';
+    upsertMeasurement(m);
+  }
+  renderHome();
+}
+
+async function syncPendingMeasurements() {
+  const arr = getMeasurements();
+  const pending = arr.filter(m => m.status === 'pending');
+  if (pending.length === 0) return;
+  showToast(`Sincronizando ${pending.length} medição(ões)...`, 'info');
+  for (const m of pending) {
+    try {
+      const ok = await sendMeasurement(m);
+      if (ok) { m.status = 'sent'; upsertMeasurement(m); }
+    } catch {}
+  }
+  renderHome();
+  const stillPending = getMeasurements().filter(m => m.status === 'pending').length;
+  if (stillPending === 0) showToast('Todas as medições sincronizadas!', 'success');
+}
+
+// ══════════════════════════════════════════════
+// NEW MEASUREMENT
+// ══════════════════════════════════════════════
+function makeEmptyMeasurement() {
+  return {
+    id: genId(),
+    status: 'draft',
+    user: currentUser,
+    createdAt: Date.now(),
+    cliente: '', endereco: '', cidade: '', cep: '', ac: '', celular: '', obs: '',
+    locais: [],
+    fotos: []
+  };
+}
+
+function makeEmptyLocal(nome = '') {
+  const loc = { nome };
+  SERVICE_TYPES.forEach(st => {
+    loc[st.key] = 0;
+    loc[st.key + 'Detalhe'] = [0];
+  });
+  return loc;
+}
+
+function startNewMeasurement() {
+  currentMeasurement = makeEmptyMeasurement();
+  openForm(1);
+}
+
+function editMeasurement(id) {
+  const m = getMeasurements().find(x => x.id === id);
+  if (!m) return;
+  currentMeasurement = JSON.parse(JSON.stringify(m)); // deep copy
+  openForm(1);
+}
+
+function openForm(step) {
+  currentStep = step;
+  // Reset step 1 fields
+  document.getElementById('f-cliente').value = currentMeasurement.cliente || '';
+  document.getElementById('f-endereco').value = currentMeasurement.endereco || '';
+  document.getElementById('f-cidade').value = currentMeasurement.cidade || '';
+  document.getElementById('f-cep').value = currentMeasurement.cep || '';
+  document.getElementById('f-ac').value = currentMeasurement.ac || '';
+  document.getElementById('f-celular').value = currentMeasurement.celular || '';
+  document.getElementById('f-obs').value = currentMeasurement.obs || '';
+
+  // Ensure at least one location
+  if (!currentMeasurement.locais || currentMeasurement.locais.length === 0) {
+    currentMeasurement.locais = [makeEmptyLocal('Local 1')];
+  }
+
+  renderLocations();
+  renderPhotos();
+  goToStep(step);
+  showScreen('form');
+}
+
+// ══════════════════════════════════════════════
+// FORM NAVIGATION
+// ══════════════════════════════════════════════
+function goToStep(n) {
+  currentStep = n;
+  document.querySelectorAll('.form-step').forEach((el, i) => {
+    el.classList.toggle('active', i + 1 === n);
+  });
+  const titles = ['Dados do cliente', 'Levantamento por local', 'Fotos', 'Resumo e envio'];
+  document.getElementById('form-step-title').textContent = titles[n - 1];
+  document.getElementById('progress-fill').style.width = (n * 25) + '%';
+
+  for (let i = 1; i <= 4; i++) {
+    document.getElementById(`slabel-${i}`).className = 'step-label' + (i === n ? ' active' : '');
+  }
+
+  // Footer buttons
+  const footer = document.getElementById('form-footer');
+  footer.innerHTML = '';
+  if (n > 1) {
+    const bb = document.createElement('button');
+    bb.className = 'btn-back'; bb.textContent = '← Voltar'; bb.onclick = goBack;
+    footer.appendChild(bb);
+  }
+  if (n < 4) {
+    const nb = document.createElement('button');
+    nb.className = 'btn-next'; nb.textContent = 'Próximo →'; nb.onclick = goNext;
+    footer.appendChild(nb);
+  } else {
+    const sd = document.createElement('button');
+    sd.className = 'btn-draft'; sd.textContent = 'Salvar Rascunho'; sd.onclick = saveDraft;
+    footer.appendChild(sd);
+    const sb = document.createElement('button');
+    sb.className = 'btn-submit'; sb.textContent = '✓ Enviar Medição'; sb.onclick = submitMeasurement;
+    footer.appendChild(sb);
+  }
+
+  if (n === 4) buildSummary();
+  window.scrollTo(0,0);
+}
+
+function goBack() {
+  if (currentStep > 1) { collectCurrentStep(); goToStep(currentStep - 1); }
+  else { showHome(); }
+}
+
+function goNext() {
+  if (!validateStep(currentStep)) return;
+  collectCurrentStep();
+  if (currentStep < 4) goToStep(currentStep + 1);
+}
+
+function validateStep(n) {
+  if (n === 1) {
+    const cliente = document.getElementById('f-cliente').value.trim();
+    const cidade = document.getElementById('f-cidade').value.trim();
+    let ok = true;
+    if (!cliente) { document.getElementById('f-cliente').classList.add('error'); showToast('Informe o nome do cliente.', 'error'); ok = false; }
+    else document.getElementById('f-cliente').classList.remove('error');
+    if (!cidade) { document.getElementById('f-cidade').classList.add('error'); if(ok) showToast('Informe a cidade.', 'error'); ok = false; }
+    else document.getElementById('f-cidade').classList.remove('error');
+    return ok;
+  }
+  if (n === 2) {
+    if (currentMeasurement.locais.length === 0) { showToast('Adicione ao menos um local.', 'error'); return false; }
+  }
+  return true;
+}
+
+function collectCurrentStep() {
+  if (currentStep === 1) {
+    currentMeasurement.cliente = document.getElementById('f-cliente').value.trim();
+    currentMeasurement.endereco = document.getElementById('f-endereco').value.trim();
+    currentMeasurement.cidade = document.getElementById('f-cidade').value.trim();
+    currentMeasurement.cep = document.getElementById('f-cep').value.trim();
+    currentMeasurement.ac = document.getElementById('f-ac').value.trim();
+    currentMeasurement.celular = document.getElementById('f-celular').value.trim();
+    currentMeasurement.obs = document.getElementById('f-obs').value.trim();
+  }
+  if (currentStep === 2) {
+    collectLocations();
+  }
+}
+
+// ══════════════════════════════════════════════
+// LOCATIONS (STEP 2)
+// ══════════════════════════════════════════════
+function renderLocations() {
+  const container = document.getElementById('locations-list');
+  container.innerHTML = '';
+  currentMeasurement.locais.forEach((loc, idx) => {
+    container.appendChild(buildLocationCard(loc, idx));
+  });
+}
+
+function buildLocationCard(loc, idx) {
+  const card = document.createElement('div');
+  card.className = 'location-card';
+  card.dataset.locIdx = idx;
+
+  // Header
+  const header = document.createElement('div');
+  header.className = 'location-card-header';
+  header.innerHTML = `
+    <div class="location-num">${idx + 1}</div>
+    <input class="location-name-input" type="text" placeholder="Nome do local (ex: Telhado)" value="${escHtml(loc.nome || '')}" data-loc="${idx}" data-field="nome">
+    <button class="btn-remove-location" onclick="removeLocation(${idx})" title="Remover local">✕</button>`;
+  card.appendChild(header);
+
+  // Fields grid
+  const grid = document.createElement('div');
+  grid.className = 'location-fields';
+  SERVICE_TYPES.forEach(st => {
+    grid.appendChild(buildFieldGroup(loc, idx, st));
+  });
+  card.appendChild(grid);
+
+  return card;
+}
+
+function buildFieldGroup(loc, locIdx, st) {
+  const detail = loc[st.key + 'Detalhe'] || [0];
+  const total = sum(detail);
+  const wrap = document.createElement('div');
+  wrap.className = 'field-group';
+  wrap.dataset.type = st.key;
+  wrap.dataset.loc = locIdx;
+
+  const label = document.createElement('div');
+  label.className = 'field-label';
+  label.textContent = st.label + ' (' + st.unit + ')';
+  wrap.appendChild(label);
+
+  const inputsContainer = document.createElement('div');
+  inputsContainer.className = 'inputs-container';
+  wrap.appendChild(inputsContainer);
+
+  detail.forEach((val, rowIdx) => {
+    inputsContainer.appendChild(buildInputRow(val, locIdx, st, rowIdx, detail.length));
+  });
+
+  const totalSpan = document.createElement('span');
+  totalSpan.className = 'field-total';
+  totalSpan.textContent = `= ${total}${st.unit}`;
+  wrap.appendChild(totalSpan);
+
+  return wrap;
+}
+
+function buildInputRow(val, locIdx, st, rowIdx, totalRows) {
+  const row = document.createElement('div');
+  row.className = 'input-row';
+
+  const input = document.createElement('input');
+  input.type = 'number';
+  input.min = '0';
+  input.step = '0.01';
+  input.value = val;
+  input.className = 'measure-input';
+  input.inputMode = 'decimal';
+  input.addEventListener('input', () => recalcField(locIdx, st.key));
+
+  const btnAdd = document.createElement('button');
+  btnAdd.className = 'btn-add-input';
+  btnAdd.title = 'Adicionar';
+  btnAdd.textContent = '+';
+  btnAdd.type = 'button';
+  btnAdd.addEventListener('click', () => addInputToField(locIdx, st.key, rowIdx));
+
+  const btnRem = document.createElement('button');
+  btnRem.className = 'btn-remove-input';
+  btnRem.title = 'Remover';
+  btnRem.textContent = '×';
+  btnRem.type = 'button';
+  btnRem.disabled = totalRows <= 1;
+  btnRem.addEventListener('click', () => removeInputFromField(locIdx, st.key, rowIdx));
+
+  row.appendChild(input);
+  row.appendChild(btnAdd);
+  row.appendChild(btnRem);
+  return row;
+}
+
+function getFieldGroup(locIdx, stKey) {
+  return document.querySelector(`.field-group[data-type="${stKey}"][data-loc="${locIdx}"]`);
+}
+
+function recalcField(locIdx, stKey) {
+  const fg = getFieldGroup(locIdx, stKey);
+  if (!fg) return;
+  const inputs = fg.querySelectorAll('.measure-input');
+  const total = Array.from(inputs).reduce((a, inp) => a + (parseFloat(inp.value) || 0), 0);
+  const st = SERVICE_TYPES.find(s => s.key === stKey);
+  const totalStr = Number.isInteger(total) ? total.toString() : total.toFixed(2).replace(/\.?0+$/, '');
+  fg.querySelector('.field-total').textContent = `= ${totalStr}${st ? st.unit : ''}`;
+}
+
+function addInputToField(locIdx, stKey, afterRowIdx) {
+  // Collect current values to rebuild
+  collectLocations();
+  const loc = currentMeasurement.locais[locIdx];
+  const detail = [...(loc[stKey + 'Detalhe'] || [0])];
+  detail.splice(afterRowIdx + 1, 0, 0);
+  loc[stKey + 'Detalhe'] = detail;
+  loc[stKey] = sum(detail);
+  // Rebuild just this field group
+  rebuildFieldGroup(locIdx, stKey);
+}
+
+function removeInputFromField(locIdx, stKey, rowIdx) {
+  collectLocations();
+  const loc = currentMeasurement.locais[locIdx];
+  const detail = [...(loc[stKey + 'Detalhe'] || [0])];
+  if (detail.length <= 1) return;
+  detail.splice(rowIdx, 1);
+  loc[stKey + 'Detalhe'] = detail;
+  loc[stKey] = sum(detail);
+  rebuildFieldGroup(locIdx, stKey);
+}
+
+function rebuildFieldGroup(locIdx, stKey) {
+  const fg = getFieldGroup(locIdx, stKey);
+  if (!fg) return;
+  const loc = currentMeasurement.locais[locIdx];
+  const st = SERVICE_TYPES.find(s => s.key === stKey);
+  const detail = loc[stKey + 'Detalhe'] || [0];
+  const total = sum(detail);
+
+  // Rebuild inputs container
+  const ic = fg.querySelector('.inputs-container');
+  ic.innerHTML = '';
+  detail.forEach((val, rowIdx) => {
+    ic.appendChild(buildInputRow(val, locIdx, st, rowIdx, detail.length));
+  });
+  const totalStr = Number.isInteger(total) ? total.toString() : total.toFixed(2).replace(/\.?0+$/, '');
+  fg.querySelector('.field-total').textContent = `= ${totalStr}${st.unit}`;
+}
+
+function addLocation() {
+  collectLocations();
+  const num = currentMeasurement.locais.length + 1;
+  currentMeasurement.locais.push(makeEmptyLocal(`Local ${num}`));
+  renderLocations();
+  // Scroll to bottom
+  const container = document.getElementById('locations-list');
+  setTimeout(() => container.lastElementChild && container.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+}
+
+function removeLocation(idx) {
+  if (currentMeasurement.locais.length <= 1) { showToast('Deve haver ao menos um local.', 'error'); return; }
+  if (!confirm('Remover este local?')) return;
+  collectLocations();
+  currentMeasurement.locais.splice(idx, 1);
+  renderLocations();
+}
+
+function collectLocations() {
+  const cards = document.querySelectorAll('.location-card');
+  cards.forEach(card => {
+    const locIdx = parseInt(card.dataset.locIdx);
+    const loc = currentMeasurement.locais[locIdx];
+    if (!loc) return;
+    // Name
+    const nameInput = card.querySelector('.location-name-input');
+    if (nameInput) loc.nome = nameInput.value;
+    // Service fields
+    SERVICE_TYPES.forEach(st => {
+      const fg = card.querySelector(`.field-group[data-type="${st.key}"]`);
+      if (!fg) return;
+      const inputs = fg.querySelectorAll('.measure-input');
+      const detail = Array.from(inputs).map(inp => parseFloat(inp.value) || 0);
+      loc[st.key + 'Detalhe'] = detail;
+      loc[st.key] = sum(detail);
+    });
+  });
+}
+
+// ══════════════════════════════════════════════
+// PHOTOS (STEP 3)
+// ══════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('photo-file-input').addEventListener('change', handlePhotoSelect);
+});
+
+function handlePhotoSelect(e) {
+  const files = Array.from(e.target.files);
+  if (!files.length) return;
+  const locName = document.getElementById('photo-location-name').value.trim() || 'Sem local';
+  let processed = 0;
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      currentMeasurement.fotos.push({ id: genId(), label: locName, data: ev.target.result });
+      processed++;
+      if (processed === files.length) renderPhotos();
+    };
+    reader.readAsDataURL(file);
+  });
+  e.target.value = '';
+}
+
+function renderPhotos() {
+  const grid = document.getElementById('photos-grid');
+  const empty = document.getElementById('photos-empty');
+  const fotos = currentMeasurement.fotos || [];
+  if (fotos.length === 0) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  grid.innerHTML = fotos.map((f, i) => `
+    <div class="photo-thumb">
+      <img src="${f.data}" alt="${escHtml(f.label)}" loading="lazy">
+      <div class="photo-label-overlay">${escHtml(f.label)}</div>
+      <button class="btn-remove-photo" onclick="removePhoto(${i})">×</button>
+    </div>`).join('');
+}
+
+function removePhoto(idx) {
+  currentMeasurement.fotos.splice(idx, 1);
+  renderPhotos();
+}
+
+// ══════════════════════════════════════════════
+// SUMMARY (STEP 4)
+// ══════════════════════════════════════════════
+function buildSummary() {
+  // Collect step 2 data before showing summary
+  collectLocations();
+
+  document.getElementById('sum-cliente').textContent = currentMeasurement.cliente || '—';
+  document.getElementById('sum-user').textContent = currentMeasurement.user || '—';
+  document.getElementById('sum-cidade').textContent = currentMeasurement.cidade || '—';
+  document.getElementById('sum-date').textContent = formatDate(currentMeasurement.createdAt);
+  document.getElementById('sum-locais').textContent = currentMeasurement.locais.length + ' local(is)';
+  document.getElementById('sum-fotos').textContent = (currentMeasurement.fotos || []).length + ' foto(s)';
+
+  const totalsDiv = document.getElementById('summary-totals');
+  totalsDiv.innerHTML = SERVICE_TYPES.map(st => {
+    const total = currentMeasurement.locais.reduce((a, l) => a + (parseFloat(l[st.key]) || 0), 0);
+    if (total === 0) return '';
+    const totalStr = Number.isInteger(total) ? total.toString() : total.toFixed(2).replace(/\.?0+$/, '');
+    return `<div class="summary-total-row">
+      <span class="summary-total-label">${st.label}</span>
+      <span class="summary-total-value">${totalStr} ${st.unit}</span>
+    </div>`;
+  }).join('') || '<div class="empty-state">Nenhum serviço cadastrado</div>';
+}
+
+// ══════════════════════════════════════════════
+// SAVE / SUBMIT
+// ══════════════════════════════════════════════
+function saveDraft() {
+  collectLocations();
+  currentMeasurement.status = 'draft';
+  upsertMeasurement(currentMeasurement);
+  showToast('Rascunho salvo!', 'success');
+  showHome();
+}
+
+async function submitMeasurement() {
+  collectLocations();
+  if (!navigator.onLine) {
+    currentMeasurement.status = 'pending';
+    upsertMeasurement(currentMeasurement);
+    showToast('Sem conexão. Medição salva e será enviada quando online.', 'info');
+    showHome();
+    return;
+  }
+  try {
+    const ok = await sendMeasurement(currentMeasurement);
+    if (ok) {
+      currentMeasurement.status = 'sent';
+      upsertMeasurement(currentMeasurement);
+      showToast('Medição enviada com sucesso!', 'success');
+      showHome();
+    } else {
+      currentMeasurement.status = 'pending';
+      upsertMeasurement(currentMeasurement);
+      showToast('Erro ao enviar. Medição salva como pendente.', 'error');
+      showHome();
+    }
+  } catch {
+    currentMeasurement.status = 'pending';
+    upsertMeasurement(currentMeasurement);
+    showToast('Erro de conexão. Medição salva como pendente.', 'error');
+    showHome();
+  }
+}
+
+// ══════════════════════════════════════════════
+// SERVICE WORKER
+// ══════════════════════════════════════════════
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').then(reg => {
+      // Listen for sync messages from SW
+      navigator.serviceWorker.addEventListener('message', e => {
+        if (e.data && e.data.type === 'SYNC_MEASUREMENTS') syncPendingMeasurements();
+      });
+    }).catch(err => console.warn('SW registration failed:', err));
+  });
+}
+
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  if (checkSession()) {
+    showHome();
+  } else {
+    showScreen('login');
+  }
+});
+</script>
+</body>
+</html>
