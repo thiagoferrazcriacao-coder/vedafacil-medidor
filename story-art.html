@@ -2,11 +2,18 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
-<title>Story Art — Mentoria Ouse Passar</title>
+<title>Story Art — OUSE+ Workshop Day</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
+  :root {
+    --neon: #39ff14;
+    --neon-soft: #6bff52;
+    --bg: #050505;
+    --ink: #ffffff;
+  }
+
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   html, body {
@@ -18,6 +25,7 @@
     gap: 24px;
     padding: 40px 20px;
     min-height: 100vh;
+    color: #fff;
   }
 
   .toolbar {
@@ -25,37 +33,36 @@
     gap: 12px;
     flex-wrap: wrap;
     justify-content: center;
+    max-width: 900px;
+    text-align: center;
   }
   .toolbar button {
-    background: #1f6feb;
-    color: #fff;
+    background: var(--neon);
+    color: #000;
     border: 0;
-    padding: 12px 20px;
+    padding: 12px 22px;
     border-radius: 10px;
-    font-weight: 600;
+    font-weight: 800;
     font-size: 14px;
     cursor: pointer;
     font-family: inherit;
+    text-transform: uppercase;
+    letter-spacing: 1px;
   }
-  .toolbar button:hover { background: #388bfd; }
-  .toolbar .hint { color: #8b949e; font-size: 12px; align-self: center; }
+  .toolbar .hint { color: #8b949e; font-size: 13px; }
 
-  /* --- Instagram Story canvas: 1080 x 1920 --- */
+  /* === Instagram Story canvas: 1080 x 1920 === */
   .story {
     width: 1080px;
     height: 1920px;
     position: relative;
     overflow: hidden;
-    color: #fff;
-    background:
-      radial-gradient(ellipse at 20% 0%, rgba(255,196,66,0.18) 0%, transparent 45%),
-      radial-gradient(ellipse at 85% 100%, rgba(255,196,66,0.12) 0%, transparent 50%),
-      linear-gradient(160deg, #0a1a3a 0%, #0d224a 45%, #061433 100%);
+    color: var(--ink);
+    background: var(--bg);
     box-shadow: 0 30px 120px rgba(0,0,0,0.6);
-    transform-origin: top center;
   }
 
-  /* scale down for preview in-browser */
+  /* preview scaling */
   .preview-wrap {
     transform: scale(0.32);
     transform-origin: top center;
@@ -64,260 +71,275 @@
     margin-bottom: calc(-1920px * 0.68);
   }
 
-  /* decorative grid + glow rings */
+  /* neon glows */
+  .glow {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    pointer-events: none;
+  }
+  .glow.a { width: 900px; height: 900px; background: rgba(57,255,20,0.28); top: -300px; right: -200px; }
+  .glow.b { width: 700px; height: 700px; background: rgba(57,255,20,0.18); bottom: -200px; left: -240px; }
+
   .grid {
-    position: absolute;
-    inset: 0;
+    position: absolute; inset: 0;
     background-image:
-      linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
-    background-size: 90px 90px;
-    mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+      linear-gradient(rgba(57,255,20,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(57,255,20,0.06) 1px, transparent 1px);
+    background-size: 80px 80px;
+    mask-image: radial-gradient(ellipse at center, black 35%, transparent 78%);
   }
-  .ring {
-    position: absolute;
-    border-radius: 50%;
-    border: 2px solid rgba(255,196,66,0.25);
-    filter: blur(0.5px);
-  }
-  .ring.r1 { width: 900px; height: 900px; right: -260px; top: -260px; }
-  .ring.r2 { width: 640px; height: 640px; right: -120px; top: -60px; border-color: rgba(255,196,66,0.18); }
-  .ring.r3 { width: 1100px; height: 1100px; left: -320px; bottom: -320px; border-color: rgba(255,255,255,0.08); }
 
-  .spark {
-    position: absolute;
-    width: 6px; height: 6px;
-    background: #ffc442;
-    border-radius: 50%;
-    box-shadow: 0 0 24px 4px rgba(255,196,66,0.8);
+  /* scanline edge bars */
+  .edge {
+    position: absolute; left: 40px; right: 40px;
+    height: 2px; background: var(--neon);
+    box-shadow: 0 0 24px var(--neon);
   }
-  .spark.s1 { top: 280px; left: 120px; }
-  .spark.s2 { top: 440px; right: 180px; width: 10px; height: 10px; }
-  .spark.s3 { bottom: 620px; left: 80px; width: 8px; height: 8px; }
-  .spark.s4 { bottom: 260px; right: 120px; }
-
-  /* --- content --- */
-  .badge {
+  .edge.top { top: 40px; }
+  .edge.bot { bottom: 40px; }
+  .corner {
     position: absolute;
-    top: 120px; left: 80px;
-    display: inline-flex;
-    align-items: center;
-    gap: 14px;
-    background: rgba(255,255,255,0.08);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    padding: 14px 24px;
-    border-radius: 999px;
-    border: 1px solid rgba(255,196,66,0.35);
-    font-weight: 600;
+    width: 48px; height: 48px;
+    border: 3px solid var(--neon);
+    box-shadow: 0 0 20px rgba(57,255,20,0.6);
+  }
+  .corner.tl { top: 40px; left: 40px; border-right: 0; border-bottom: 0; }
+  .corner.tr { top: 40px; right: 40px; border-left: 0; border-bottom: 0; }
+  .corner.bl { bottom: 40px; left: 40px; border-right: 0; border-top: 0; }
+  .corner.br { bottom: 40px; right: 40px; border-left: 0; border-top: 0; }
+
+  /* --- LOGO OUSE+ (recriado em SVG) --- */
+  .logo {
+    position: absolute;
+    top: 110px; left: 50%; transform: translateX(-50%);
+    width: 460px;
+    text-align: center;
+  }
+  .logo svg { width: 100%; height: auto; display: block; }
+  .logo .tag {
+    margin-top: 8px;
+    font-family: 'Inter', sans-serif;
+    color: var(--neon);
+    font-weight: 700;
+    letter-spacing: 14px;
+    font-size: 26px;
+    text-transform: uppercase;
+    text-shadow: 0 0 14px rgba(57,255,20,0.6);
+  }
+  .logo .divider-line {
+    height: 2px;
+    background: rgba(255,255,255,0.8);
+    margin: 10px auto 14px;
+    width: 90%;
+  }
+
+  /* --- MENTOR PHOTO --- */
+  .mentor-wrap {
+    position: absolute;
+    top: 420px; left: 50%;
+    transform: translateX(-50%);
+    width: 720px;
+    height: 820px;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow:
+      0 0 0 3px var(--neon),
+      0 0 60px rgba(57,255,20,0.35),
+      0 30px 80px rgba(0,0,0,0.6);
+    background: #101010;
+  }
+  .mentor-wrap img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+  }
+  .mentor-wrap::after {
+    content: "";
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 55%, rgba(0,0,0,0.55) 85%, rgba(0,0,0,0.9) 100%);
+    pointer-events: none;
+  }
+
+  /* fallback placeholder when image missing */
+  .mentor-wrap .placeholder {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: #555;
+    font-weight: 700;
     letter-spacing: 2px;
     font-size: 22px;
-    text-transform: uppercase;
-  }
-  .badge .dot {
-    width: 12px; height: 12px; border-radius: 50%;
-    background: #ffc442;
-    box-shadow: 0 0 14px #ffc442;
+    text-align: center;
+    padding: 30px;
+    line-height: 1.5;
   }
 
-  .brand {
+  /* --- HEADLINE --- */
+  .event-tag {
     position: absolute;
-    top: 230px; left: 80px; right: 80px;
-    font-family: 'Bebas Neue', 'Inter', sans-serif;
-    font-size: 88px;
-    line-height: 0.9;
-    letter-spacing: 2px;
-    color: #ffc442;
-    text-shadow: 0 4px 30px rgba(255,196,66,0.35);
+    top: 1290px; left: 50%; transform: translateX(-50%);
+    color: var(--neon);
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    letter-spacing: 10px;
+    font-size: 22px;
+    text-transform: uppercase;
   }
 
   .headline {
     position: absolute;
-    top: 430px; left: 80px; right: 80px;
+    top: 1340px; left: 0; right: 0;
+    text-align: center;
+    font-family: 'Orbitron', sans-serif;
     font-weight: 900;
     font-size: 130px;
-    line-height: 1;
-    letter-spacing: -3px;
+    line-height: 0.95;
+    letter-spacing: 4px;
+    color: var(--ink);
   }
-  .headline .thin { font-weight: 300; font-size: 64px; display: block; letter-spacing: 0; margin-bottom: 12px; opacity: 0.9; }
-  .headline .highlight {
-    background: linear-gradient(90deg, #ffc442 0%, #ffe08a 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-  .headline .stroke {
-    -webkit-text-stroke: 3px #ffc442;
-    color: transparent;
-    display: block;
-  }
-
-  .divider {
-    position: absolute;
-    left: 80px;
-    top: 1000px;
-    width: 120px;
-    height: 8px;
-    background: #ffc442;
-    border-radius: 4px;
+  .headline .green {
+    color: var(--neon);
+    text-shadow: 0 0 30px rgba(57,255,20,0.55);
   }
 
   .subcopy {
     position: absolute;
-    top: 1060px; left: 80px; right: 80px;
-    font-size: 38px;
+    top: 1510px; left: 90px; right: 90px;
+    text-align: center;
+    font-size: 32px;
     line-height: 1.35;
     font-weight: 500;
-    color: #e6ecf5;
-    max-width: 780px;
+    color: #d7ffd4;
   }
-  .subcopy b { color: #ffc442; font-weight: 700; }
+  .subcopy b { color: var(--neon); font-weight: 800; }
 
-  .benefits {
-    position: absolute;
-    top: 1280px; left: 80px; right: 80px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-  .benefit {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    font-size: 34px;
-    font-weight: 600;
-    color: #fff;
-  }
-  .check {
-    width: 56px; height: 56px;
-    border-radius: 50%;
-    background: rgba(255,196,66,0.15);
-    border: 2px solid #ffc442;
-    display: flex; align-items: center; justify-content: center;
-    color: #ffc442;
-    font-size: 32px;
-    font-weight: 900;
-    flex-shrink: 0;
-  }
-
+  /* --- CTA --- */
   .cta {
     position: absolute;
-    left: 80px; right: 80px; bottom: 220px;
-    background: linear-gradient(90deg, #ffc442 0%, #ffd76b 100%);
-    color: #0a1a3a;
-    padding: 44px 56px;
-    border-radius: 28px;
+    left: 140px; right: 140px;
+    bottom: 260px;
+    background: var(--neon);
+    color: #000;
+    padding: 38px 40px;
+    border-radius: 18px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    box-shadow: 0 20px 60px rgba(255,196,66,0.35);
-  }
-  .cta .label { font-size: 32px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; }
-  .cta .arrow {
-    width: 80px; height: 80px;
-    border-radius: 50%;
-    background: #0a1a3a;
-    color: #ffc442;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 40px;
+    justify-content: center;
+    gap: 20px;
+    font-family: 'Orbitron', sans-serif;
     font-weight: 900;
+    font-size: 34px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    box-shadow: 0 0 40px rgba(57,255,20,0.55), 0 20px 40px rgba(0,0,0,0.4);
   }
+  .cta .arrow { font-weight: 900; }
 
   .url {
     position: absolute;
-    left: 0; right: 0; bottom: 110px;
+    left: 0; right: 0; bottom: 150px;
     text-align: center;
-    font-size: 32px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 26px;
     font-weight: 700;
-    letter-spacing: 3px;
-    color: #ffc442;
-  }
-  .url small {
-    display: block;
-    color: rgba(255,255,255,0.55);
-    font-size: 20px;
-    font-weight: 500;
-    letter-spacing: 4px;
-    margin-top: 6px;
-    text-transform: uppercase;
+    letter-spacing: 6px;
+    color: var(--ink);
   }
 
   .swipe {
     position: absolute;
-    left: 0; right: 0; bottom: 50px;
+    left: 0; right: 0; bottom: 70px;
     text-align: center;
-    color: rgba(255,255,255,0.7);
-    font-size: 22px;
-    font-weight: 600;
-    letter-spacing: 6px;
+    color: var(--neon);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 8px;
     text-transform: uppercase;
     animation: pulse 1.6s ease-in-out infinite;
   }
-  @keyframes pulse { 0%,100% { opacity: 0.5; transform: translateY(0);} 50% { opacity: 1; transform: translateY(-6px);} }
+  @keyframes pulse { 0%,100% { opacity: 0.55; transform: translateY(0);} 50% { opacity: 1; transform: translateY(-6px);} }
+
+  @media print {
+    @page { size: 1080px 1920px; margin: 0; }
+    html, body { background: #000; padding: 0; }
+    .toolbar { display: none; }
+    .preview-wrap { transform: none; margin: 0; }
+  }
 </style>
 </head>
 <body>
   <div class="toolbar">
-    <button onclick="window.print()">Baixar / Imprimir</button>
-    <span class="hint">Dica: abra no navegador, use "Imprimir → Salvar PDF" ou tire um screenshot em 1080×1920.</span>
+    <button onclick="window.print()">Baixar em PDF</button>
+    <span class="hint">
+      Para a arte real: salve sua foto como <b>mentor.jpg</b> na mesma pasta deste HTML,
+      abra no Chrome e use DevTools (F12) → Device Toolbar → resolução 1080×1920 → screenshot de tela cheia.
+    </span>
   </div>
 
   <div class="preview-wrap">
     <div class="story" id="story">
+
+      <div class="glow a"></div>
+      <div class="glow b"></div>
       <div class="grid"></div>
-      <div class="ring r1"></div>
-      <div class="ring r2"></div>
-      <div class="ring r3"></div>
-      <span class="spark s1"></span>
-      <span class="spark s2"></span>
-      <span class="spark s3"></span>
-      <span class="spark s4"></span>
 
-      <div class="badge"><span class="dot"></span> Mentoria · Concursos</div>
+      <div class="edge top"></div>
+      <div class="edge bot"></div>
+      <span class="corner tl"></span>
+      <span class="corner tr"></span>
+      <span class="corner bl"></span>
+      <span class="corner br"></span>
 
-      <div class="brand">OUSE<br/>PASSAR</div>
-
-      <div class="headline">
-        <span class="thin">Pare de estudar no escuro.</span>
-        <span class="highlight">METODOLOGIA</span>
-        <span class="stroke">QUE APROVA.</span>
+      <!-- LOGO OUSE+ -->
+      <div class="logo">
+        <svg viewBox="0 0 600 160" xmlns="http://www.w3.org/2000/svg" aria-label="OUSE+">
+          <defs>
+            <style>
+              .lt { font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 150px; fill: #fff; letter-spacing: 4px;}
+            </style>
+          </defs>
+          <text x="0" y="130" class="lt">OUSE+</text>
+          <!-- quadrado verde dentro do U -->
+          <rect x="168" y="68" width="28" height="28" fill="#39ff14"/>
+        </svg>
+        <div class="divider-line"></div>
+        <div class="tag">WORKSHOP&nbsp;DAY</div>
       </div>
 
-      <div class="divider"></div>
+      <!-- FOTO DO MENTOR -->
+      <div class="mentor-wrap">
+        <img src="mentor.jpg" alt="Mentor"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="placeholder" style="display:none;">
+          Salve sua foto como<br/>
+          <span style="color:#39ff14; font-size: 30px;">mentor.jpg</span><br/>
+          nesta pasta para aparecer aqui
+        </div>
+      </div>
+
+      <!-- HEADLINE -->
+      <div class="event-tag">·&nbsp;&nbsp;EVENTO PRESENCIAL&nbsp;&nbsp;·</div>
+      <div class="headline">
+        1 DIA QUE<br/>
+        <span class="green">MUDA TUDO</span>
+      </div>
 
       <div class="subcopy">
-        Planeje, estude e revise do jeito certo. Uma mentoria feita para <b>transformar seu esforço em aprovação</b> no concurso dos seus sonhos.
+        Estratégias práticas para você <b>OUSAR MAIS</b> na carreira,
+        no negócio e na vida. Vagas limitadas.
       </div>
 
-      <div class="benefits">
-        <div class="benefit"><span class="check">&#10003;</span> Planejamento estratégico de estudos</div>
-        <div class="benefit"><span class="check">&#10003;</span> Técnicas de revisão e memorização</div>
-        <div class="benefit"><span class="check">&#10003;</span> Foco no que realmente cai na prova</div>
-      </div>
-
+      <!-- CTA -->
       <div class="cta">
-        <span class="label">Garanta sua vaga</span>
-        <span class="arrow">&#8250;</span>
+        INSCREVA-SE <span class="arrow">&rarr;</span>
       </div>
 
-      <div class="url">
-        WWW.MENTORIAOUSE.COM.BR
-        <small>Sua aprovação começa aqui</small>
-      </div>
+      <div class="url">WWW.MENTORIAOUSE.COM.BR</div>
 
-      <div class="swipe">&#8593; arraste para cima</div>
+      <div class="swipe">&uarr;&nbsp;&nbsp;ARRASTE PARA CIMA</div>
     </div>
   </div>
-
-  <script>
-    // preserve exact 1080x1920 when printing/screenshotting
-    const mq = window.matchMedia('print');
-    function onPrint(){
-      const w = document.querySelector('.preview-wrap');
-      w.style.transform = 'none';
-      w.style.marginBottom = '0';
-    }
-    window.addEventListener('beforeprint', onPrint);
-  </script>
 </body>
 </html>
