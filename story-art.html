@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<title>Story Art — Mentoria Ouse Passar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    background: #111;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    padding: 40px 20px;
+    min-height: 100vh;
+  }
+
+  .toolbar {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .toolbar button {
+    background: #1f6feb;
+    color: #fff;
+    border: 0;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .toolbar button:hover { background: #388bfd; }
+  .toolbar .hint { color: #8b949e; font-size: 12px; align-self: center; }
+
+  /* --- Instagram Story canvas: 1080 x 1920 --- */
+  .story {
+    width: 1080px;
+    height: 1920px;
+    position: relative;
+    overflow: hidden;
+    color: #fff;
+    background:
+      radial-gradient(ellipse at 20% 0%, rgba(255,196,66,0.18) 0%, transparent 45%),
+      radial-gradient(ellipse at 85% 100%, rgba(255,196,66,0.12) 0%, transparent 50%),
+      linear-gradient(160deg, #0a1a3a 0%, #0d224a 45%, #061433 100%);
+    box-shadow: 0 30px 120px rgba(0,0,0,0.6);
+    transform-origin: top center;
+  }
+
+  /* scale down for preview in-browser */
+  .preview-wrap {
+    transform: scale(0.32);
+    transform-origin: top center;
+    width: 1080px;
+    height: 1920px;
+    margin-bottom: calc(-1920px * 0.68);
+  }
+
+  /* decorative grid + glow rings */
+  .grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size: 90px 90px;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+  }
+  .ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 2px solid rgba(255,196,66,0.25);
+    filter: blur(0.5px);
+  }
+  .ring.r1 { width: 900px; height: 900px; right: -260px; top: -260px; }
+  .ring.r2 { width: 640px; height: 640px; right: -120px; top: -60px; border-color: rgba(255,196,66,0.18); }
+  .ring.r3 { width: 1100px; height: 1100px; left: -320px; bottom: -320px; border-color: rgba(255,255,255,0.08); }
+
+  .spark {
+    position: absolute;
+    width: 6px; height: 6px;
+    background: #ffc442;
+    border-radius: 50%;
+    box-shadow: 0 0 24px 4px rgba(255,196,66,0.8);
+  }
+  .spark.s1 { top: 280px; left: 120px; }
+  .spark.s2 { top: 440px; right: 180px; width: 10px; height: 10px; }
+  .spark.s3 { bottom: 620px; left: 80px; width: 8px; height: 8px; }
+  .spark.s4 { bottom: 260px; right: 120px; }
+
+  /* --- content --- */
+  .badge {
+    position: absolute;
+    top: 120px; left: 80px;
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    padding: 14px 24px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,196,66,0.35);
+    font-weight: 600;
+    letter-spacing: 2px;
+    font-size: 22px;
+    text-transform: uppercase;
+  }
+  .badge .dot {
+    width: 12px; height: 12px; border-radius: 50%;
+    background: #ffc442;
+    box-shadow: 0 0 14px #ffc442;
+  }
+
+  .brand {
+    position: absolute;
+    top: 230px; left: 80px; right: 80px;
+    font-family: 'Bebas Neue', 'Inter', sans-serif;
+    font-size: 88px;
+    line-height: 0.9;
+    letter-spacing: 2px;
+    color: #ffc442;
+    text-shadow: 0 4px 30px rgba(255,196,66,0.35);
+  }
+
+  .headline {
+    position: absolute;
+    top: 430px; left: 80px; right: 80px;
+    font-weight: 900;
+    font-size: 130px;
+    line-height: 1;
+    letter-spacing: -3px;
+  }
+  .headline .thin { font-weight: 300; font-size: 64px; display: block; letter-spacing: 0; margin-bottom: 12px; opacity: 0.9; }
+  .headline .highlight {
+    background: linear-gradient(90deg, #ffc442 0%, #ffe08a 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .headline .stroke {
+    -webkit-text-stroke: 3px #ffc442;
+    color: transparent;
+    display: block;
+  }
+
+  .divider {
+    position: absolute;
+    left: 80px;
+    top: 1000px;
+    width: 120px;
+    height: 8px;
+    background: #ffc442;
+    border-radius: 4px;
+  }
+
+  .subcopy {
+    position: absolute;
+    top: 1060px; left: 80px; right: 80px;
+    font-size: 38px;
+    line-height: 1.35;
+    font-weight: 500;
+    color: #e6ecf5;
+    max-width: 780px;
+  }
+  .subcopy b { color: #ffc442; font-weight: 700; }
+
+  .benefits {
+    position: absolute;
+    top: 1280px; left: 80px; right: 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .benefit {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-size: 34px;
+    font-weight: 600;
+    color: #fff;
+  }
+  .check {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: rgba(255,196,66,0.15);
+    border: 2px solid #ffc442;
+    display: flex; align-items: center; justify-content: center;
+    color: #ffc442;
+    font-size: 32px;
+    font-weight: 900;
+    flex-shrink: 0;
+  }
+
+  .cta {
+    position: absolute;
+    left: 80px; right: 80px; bottom: 220px;
+    background: linear-gradient(90deg, #ffc442 0%, #ffd76b 100%);
+    color: #0a1a3a;
+    padding: 44px 56px;
+    border-radius: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 20px 60px rgba(255,196,66,0.35);
+  }
+  .cta .label { font-size: 32px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; }
+  .cta .arrow {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: #0a1a3a;
+    color: #ffc442;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 40px;
+    font-weight: 900;
+  }
+
+  .url {
+    position: absolute;
+    left: 0; right: 0; bottom: 110px;
+    text-align: center;
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: #ffc442;
+  }
+  .url small {
+    display: block;
+    color: rgba(255,255,255,0.55);
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: 4px;
+    margin-top: 6px;
+    text-transform: uppercase;
+  }
+
+  .swipe {
+    position: absolute;
+    left: 0; right: 0; bottom: 50px;
+    text-align: center;
+    color: rgba(255,255,255,0.7);
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100% { opacity: 0.5; transform: translateY(0);} 50% { opacity: 1; transform: translateY(-6px);} }
+</style>
+</head>
+<body>
+  <div class="toolbar">
+    <button onclick="window.print()">Baixar / Imprimir</button>
+    <span class="hint">Dica: abra no navegador, use "Imprimir → Salvar PDF" ou tire um screenshot em 1080×1920.</span>
+  </div>
+
+  <div class="preview-wrap">
+    <div class="story" id="story">
+      <div class="grid"></div>
+      <div class="ring r1"></div>
+      <div class="ring r2"></div>
+      <div class="ring r3"></div>
+      <span class="spark s1"></span>
+      <span class="spark s2"></span>
+      <span class="spark s3"></span>
+      <span class="spark s4"></span>
+
+      <div class="badge"><span class="dot"></span> Mentoria · Concursos</div>
+
+      <div class="brand">OUSE<br/>PASSAR</div>
+
+      <div class="headline">
+        <span class="thin">Pare de estudar no escuro.</span>
+        <span class="highlight">METODOLOGIA</span>
+        <span class="stroke">QUE APROVA.</span>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="subcopy">
+        Planeje, estude e revise do jeito certo. Uma mentoria feita para <b>transformar seu esforço em aprovação</b> no concurso dos seus sonhos.
+      </div>
+
+      <div class="benefits">
+        <div class="benefit"><span class="check">&#10003;</span> Planejamento estratégico de estudos</div>
+        <div class="benefit"><span class="check">&#10003;</span> Técnicas de revisão e memorização</div>
+        <div class="benefit"><span class="check">&#10003;</span> Foco no que realmente cai na prova</div>
+      </div>
+
+      <div class="cta">
+        <span class="label">Garanta sua vaga</span>
+        <span class="arrow">&#8250;</span>
+      </div>
+
+      <div class="url">
+        WWW.MENTORIAOUSE.COM.BR
+        <small>Sua aprovação começa aqui</small>
+      </div>
+
+      <div class="swipe">&#8593; arraste para cima</div>
+    </div>
+  </div>
+
+  <script>
+    // preserve exact 1080x1920 when printing/screenshotting
+    const mq = window.matchMedia('print');
+    function onPrint(){
+      const w = document.querySelector('.preview-wrap');
+      w.style.transform = 'none';
+      w.style.marginBottom = '0';
+    }
+    window.addEventListener('beforeprint', onPrint);
+  </script>
+</body>
+</html>
