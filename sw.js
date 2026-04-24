@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vedafacil-medidor-v1';
+const CACHE_NAME = 'vedafacil-medidor-v8';
 const CACHE_FILES = [
   './index.html',
   './sw.js',
@@ -29,24 +29,36 @@ self.addEventListener('activate', event => {
 
 // Fetch: serve from cache, fallback to network
 self.addEventListener('fetch', event => {
+  // Não interceptar POST/não-GET — deixar ir direto para a rede
+  // (interceptar POST causa hang permanente quando o servidor falha)
+  if (event.request.method !== 'GET') return;
+
+  // Não interceptar requisições cross-origin (ex: webhook do servidor)
+  const url = new URL(event.request.url);
+  if (url.origin !== self.location.origin) return;
+
   event.respondWith(
     caches.match(event.request).then(cached => {
       if (cached) return cached;
       return fetch(event.request).then(response => {
-        // Cache successful GET responses
-        if (event.request.method === 'GET' && response.status === 200) {
+        if (response.status === 200) {
           const clone = response.clone();
           caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
         }
         return response;
       }).catch(() => {
-        // Offline fallback for navigation
         if (event.request.mode === 'navigate') {
           return caches.match('./index.html');
         }
+        throw new Error('offline');
       });
     })
   );
+});
+
+// Força ativação imediata quando app manda SKIP_WAITING
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
 // Background sync: retry pending measurements
