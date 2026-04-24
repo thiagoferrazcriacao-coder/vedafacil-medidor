@@ -323,6 +323,7 @@
       box-shadow: var(--shadow);
       margin-bottom: 16px;
       overflow: hidden;
+      overflow-x: hidden;
     }
     .location-card-header {
       background: var(--primary-light);
@@ -369,11 +370,20 @@
       min-height: 36px;
     }
 
+    /* CHANGE 3 — responsive location-fields */
     .location-fields {
       padding: 12px 14px;
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
       gap: 12px;
+    }
+
+    @media (max-width: 400px) {
+      .location-fields {
+        grid-template-columns: 1fr 1fr;
+      }
+      .measure-input { font-size: 14px; padding: 6px 6px; }
+      .btn-add-input, .btn-remove-input { width: 26px; height: 30px; font-size: 16px; }
     }
 
     .field-group { display: flex; flex-direction: column; gap: 4px; }
@@ -460,49 +470,46 @@
       min-height: 52px;
     }
 
-    /* Step 3 - Photos */
-    .photo-location-input {
-      width: 100%;
+    /* CHANGE 4e — Per-location photos */
+    .location-photo-section {
+      border-top: 1px solid var(--gray-200);
       padding: 12px 14px;
-      border: 1.5px solid var(--gray-300);
-      border-radius: 8px;
-      font-size: 16px;
-      outline: none;
-      margin-bottom: 12px;
-      background: white;
+      background: var(--gray-50);
     }
-    .photo-location-input:focus { border-color: var(--primary); }
-
-    .btn-add-photo {
-      display: flex;
+    .location-photo-header {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--gray-600);
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      margin-bottom: 8px;
+    }
+    .btn-add-location-photo {
+      display: inline-flex;
       align-items: center;
-      justify-content: center;
-      gap: 10px;
-      width: 100%;
-      padding: 16px;
+      gap: 6px;
+      padding: 8px 14px;
       background: var(--primary);
       color: white;
       border: none;
-      border-radius: var(--radius);
-      font-size: 16px;
+      border-radius: 8px;
+      font-size: 13px;
       font-weight: 600;
       cursor: pointer;
-      margin-bottom: 16px;
-      min-height: 52px;
+      margin-bottom: 10px;
+      min-height: 36px;
     }
-    #photo-file-input { display: none; }
-
-    .photos-grid {
+    .location-photos-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 16px;
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      gap: 8px;
     }
+
     .photo-thumb {
       position: relative;
       border-radius: 10px;
       overflow: hidden;
-      aspect-ratio: 4/3;
+      aspect-ratio: 1;
       background: var(--gray-200);
       box-shadow: var(--shadow);
     }
@@ -510,17 +517,6 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-    }
-    .photo-label-overlay {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: linear-gradient(transparent, rgba(0,0,0,0.7));
-      color: white;
-      padding: 16px 8px 6px;
-      font-size: 12px;
-      font-weight: 600;
     }
     .btn-remove-photo {
       position: absolute;
@@ -539,9 +535,8 @@
       justify-content: center;
       line-height: 1;
     }
-    .photos-empty { text-align: center; color: var(--gray-500); padding: 20px; font-size: 14px; }
 
-    /* Step 4 - Summary */
+    /* Step 3 - Summary */
     .summary-card {
       background: white;
       border-radius: var(--radius);
@@ -649,6 +644,39 @@
     .toast.success { background: var(--success); }
     .toast.error { background: var(--danger); }
     .toast.info { background: var(--info); }
+
+    /* CHANGE 6c — Google Calendar */
+    .btn-calendar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 12px;
+      background: white;
+      color: #1a73e8;
+      border: 1.5px solid #1a73e8;
+      border-radius: var(--radius);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 16px;
+      min-height: 48px;
+    }
+    .calendar-event-card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      padding: 12px 14px;
+      margin-bottom: 8px;
+      border-left: 3px solid #1a73e8;
+      cursor: pointer;
+      transition: box-shadow 0.15s;
+    }
+    .calendar-event-card:active { box-shadow: none; }
+    .calendar-event-title { font-weight: 700; font-size: 14px; color: var(--gray-900); margin-bottom: 3px; }
+    .calendar-event-time { font-size: 12px; color: var(--gray-500); }
+    .calendar-event-location { font-size: 12px; color: var(--primary); margin-top: 2px; }
   </style>
 </head>
 <body>
@@ -660,10 +688,12 @@
   <div class="login-box">
     <div class="login-logo">V</div>
     <div class="login-title">Vedafácil</div>
-    <div class="login-subtitle">Selecione seu nome para continuar</div>
-    <button class="login-btn" onclick="doLogin('Edson')">Edson</button>
-    <button class="login-btn" onclick="doLogin('Fernando')">Fernando</button>
-    <button class="login-btn" onclick="doLogin('Alan')">Alan</button>
+    <div class="login-subtitle">Entre com sua conta Google</div>
+
+    <button class="login-btn" onclick="doLoginGoogle()" style="background:white;color:#333;border:1.5px solid #ddd;display:flex;align-items:center;justify-content:center;gap:10px;font-size:15px;margin-bottom:20px;">
+      <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/><path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/><path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24c0 3.55.85 6.91 2.34 9.88l7.35-5.7z"/><path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/></svg>
+      Entrar com Google
+    </button>
   </div>
 </div>
 
@@ -674,7 +704,7 @@
   <div class="home-header">
     <div class="home-header-top">
       <div>
-        <div class="home-greeting" id="home-greeting">Olá, Edson</div>
+        <div class="home-greeting" id="home-greeting">Olá</div>
         <div class="home-date" id="home-date"></div>
       </div>
       <div class="badge-online" id="online-badge">
@@ -693,6 +723,15 @@
       <span style="font-size:22px; line-height:1;">+</span> Nova Medição
     </button>
 
+    <!-- CHANGE 6b — Google Calendar section -->
+    <div id="calendar-section" style="display:none;">
+      <div class="section-title" style="margin-top:4px;">Próximos agendamentos</div>
+      <div id="calendar-events"></div>
+    </div>
+    <button class="btn-calendar" id="btn-calendar" onclick="connectGoogleCalendar()" style="display:none;">
+      📅 Conectar Google Agenda
+    </button>
+
     <div class="section-title">Pendentes de envio</div>
     <div id="list-pending"></div>
 
@@ -704,19 +743,21 @@
 </div>
 
 <!-- ══════════════════════════════════════════════
-     SCREEN 3-6: FORM
+     SCREEN 3-5: FORM (3 steps)
 ══════════════════════════════════════════════ -->
 <div id="screen-form" class="screen">
   <div class="form-header">
-    <div class="form-title" id="form-step-title">Dados do cliente</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <div class="form-title" id="form-step-title">Dados do cliente</div>
+      <button onclick="showHome()" style="background:none;border:none;color:white;font-size:22px;cursor:pointer;padding:4px 8px;opacity:0.85;" title="Voltar ao início">🏠</button>
+    </div>
     <div class="progress-bar-wrap">
-      <div class="progress-bar-fill" id="progress-fill" style="width:25%"></div>
+      <div class="progress-bar-fill" id="progress-fill" style="width:33%"></div>
     </div>
     <div class="step-labels">
       <span class="step-label active" id="slabel-1">1. Cliente</span>
       <span class="step-label" id="slabel-2">2. Locais</span>
-      <span class="step-label" id="slabel-3">3. Fotos</span>
-      <span class="step-label" id="slabel-4">4. Resumo</span>
+      <span class="step-label" id="slabel-3">3. Resumo</span>
     </div>
   </div>
 
@@ -724,6 +765,10 @@
 
     <!-- STEP 1: Client data -->
     <div class="form-step active" id="step-1">
+      <div class="form-group">
+        <label class="form-label">CEP</label>
+        <input class="form-input" id="f-cep" type="text" placeholder="00000-000" inputmode="numeric">
+      </div>
       <div class="form-group">
         <label class="form-label">Nome do cliente <span class="req">*</span></label>
         <input class="form-input" id="f-cliente" type="text" placeholder="Ex: Condomínio Solar">
@@ -738,19 +783,13 @@
           <input class="form-input" id="f-cidade" type="text" placeholder="Cidade">
         </div>
         <div class="form-group">
-          <label class="form-label">CEP</label>
-          <input class="form-input" id="f-cep" type="text" placeholder="00000-000" inputmode="numeric">
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
           <label class="form-label">AC</label>
           <input class="form-input" id="f-ac" type="text" placeholder="AC">
         </div>
-        <div class="form-group">
-          <label class="form-label">Celular</label>
-          <input class="form-input" id="f-celular" type="tel" placeholder="(00) 00000-0000">
-        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Celular</label>
+        <input class="form-input" id="f-celular" type="tel" placeholder="(00) 00000-0000">
       </div>
       <div class="form-group">
         <label class="form-label">Observações</label>
@@ -758,7 +797,7 @@
       </div>
     </div>
 
-    <!-- STEP 2: Locations -->
+    <!-- STEP 2: Locations (with photos) -->
     <div class="form-step" id="step-2">
       <div id="locations-list"></div>
       <button class="btn-add-location" onclick="addLocation()">
@@ -766,22 +805,8 @@
       </button>
     </div>
 
-    <!-- STEP 3: Photos -->
+    <!-- STEP 3: Summary -->
     <div class="form-step" id="step-3">
-      <div class="form-group">
-        <label class="form-label">Nome do local desta foto</label>
-        <input class="photo-location-input" id="photo-location-name" type="text" placeholder="Ex: Telhado, Garagem...">
-      </div>
-      <button class="btn-add-photo" onclick="document.getElementById('photo-file-input').click()">
-        📷 Adicionar Foto
-      </button>
-      <input type="file" id="photo-file-input" accept="image/*" capture="environment" multiple>
-      <div class="photos-grid" id="photos-grid"></div>
-      <div class="photos-empty" id="photos-empty">Nenhuma foto adicionada ainda.</div>
-    </div>
-
-    <!-- STEP 4: Summary -->
-    <div class="form-step" id="step-4">
       <div class="summary-card">
         <div class="summary-title">Dados do cliente</div>
         <div class="summary-row"><span class="summary-row-label">Cliente</span><span class="summary-row-value" id="sum-cliente">—</span></div>
@@ -805,6 +830,24 @@
   </div>
 </div>
 
+<!-- ══════════════════════════════════════════════
+     SCREEN: SUCCESS
+══════════════════════════════════════════════ -->
+<div id="screen-success" class="screen" style="background:linear-gradient(160deg,var(--primary) 0%,var(--primary-dark) 100%);align-items:center;justify-content:center;padding:32px;text-align:center;">
+  <div style="color:white;max-width:320px;">
+    <div style="font-size:72px;margin-bottom:16px;">✅</div>
+    <div style="font-size:28px;font-weight:700;margin-bottom:8px;">Medição enviada!</div>
+    <div id="success-cliente" style="font-size:17px;opacity:0.85;margin-bottom:8px;"></div>
+    <div id="success-cidade" style="font-size:15px;opacity:0.65;margin-bottom:40px;"></div>
+    <button onclick="startNewMeasurement()" style="display:block;width:100%;padding:18px;background:white;color:var(--primary);border:none;border-radius:var(--radius);font-size:17px;font-weight:700;cursor:pointer;margin-bottom:12px;">
+      + Nova Medição
+    </button>
+    <button onclick="showHome()" style="display:block;width:100%;padding:14px;background:rgba(255,255,255,0.15);color:white;border:2px solid rgba(255,255,255,0.4);border-radius:var(--radius);font-size:15px;font-weight:600;cursor:pointer;">
+      Ver histórico
+    </button>
+  </div>
+</div>
+
 <!-- Toast container -->
 <div id="toast-container"></div>
 
@@ -813,6 +856,11 @@
 // CONSTANTS
 // ══════════════════════════════════════════════
 const WEBHOOK_URL = 'https://vedafacil-painel.vercel.app/api/medicao';
+
+// CHANGE 6a — Google Calendar constants
+const GOOGLE_CLIENT_ID = 'SEU_GOOGLE_CLIENT_ID_AQUI'; // Configure no Google Cloud Console
+const GOOGLE_SCOPES = 'https://www.googleapis.com/auth/calendar.readonly';
+let googleAccessToken = null;
 
 const SERVICE_TYPES = [
   { key: 'trinca',     label: 'Trincas',              unit: 'm'   },
@@ -894,11 +942,61 @@ function doLogout() {
   showScreen('login');
 }
 
+function doLoginGoogle() {
+  const PANEL_BASE = WEBHOOK_URL.replace('/api/medicao', '');
+  window.location.href = `${PANEL_BASE}/api/auth/google?source=medidor`;
+}
+
+async function loadServerCalendarEvents(token) {
+  const PANEL_BASE = WEBHOOK_URL.replace('/api/medicao', '');
+  const container = document.getElementById('calendar-events');
+  if (!container) return;
+  container.innerHTML = '<div style="text-align:center;padding:12px;color:#888;font-size:13px;">Carregando agendamentos...</div>';
+  document.getElementById('calendar-section').style.display = 'block';
+  try {
+    const r = await fetch(`${PANEL_BASE}/api/calendar/events`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!r.ok) { container.innerHTML = ''; document.getElementById('calendar-section').style.display = 'none'; return; }
+    const events = await r.json();
+    renderCalendarEventsFromServer(events, container);
+  } catch (err) {
+    container.innerHTML = '';
+    document.getElementById('calendar-section').style.display = 'none';
+  }
+}
+
+function renderCalendarEventsFromServer(events, container) {
+  if (!events || events.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:12px;color:#888;font-size:13px;">Sem agendamentos nos próximos 30 dias</div>';
+    return;
+  }
+  window._calendarEvents = events;
+  container.innerHTML = events.map((ev, i) => {
+    // Server returns flat: ev.title (from summary), ev.start (string), ev.location
+    const date = ev.start ? new Date(ev.start) : null;
+    const timeStr = date && !isNaN(date)
+      ? date.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit' }) + (ev.start.includes('T') ? ' ' + date.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' }) : '')
+      : '';
+    return `<div class="calendar-event-card">
+      <div class="calendar-event-title">${escHtml(ev.title || '(sem título)')}</div>
+      ${timeStr ? `<div class="calendar-event-time">📅 ${timeStr}</div>` : ''}
+      ${ev.location ? `<div class="calendar-event-location">📍 ${escHtml(ev.location)}</div>` : ''}
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <a href="${ev.htmlLink || 'https://calendar.google.com/calendar/r'}" target="_blank" style="flex:1;padding:8px;background:#f0f4ff;color:#1a5c9a;border:1px solid #c0d0f0;border-radius:8px;font-size:13px;font-weight:600;text-align:center;text-decoration:none;">📅 Ver agenda</a>
+        <button onclick="startFromCalendarEvent(${i})" style="flex:1;padding:8px;background:#1a5c9a;color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">📐 Fazer medição</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 function checkSession() {
   const raw = localStorage.getItem('vf_user');
   if (!raw) return false;
   try {
     const s = JSON.parse(raw);
+    // Rejeitar sessões antigas sem googleToken (sistema anterior de seleção de nome)
+    if (!s.googleToken) { localStorage.removeItem('vf_user'); return false; }
     if (Date.now() > s.expiresAt) { localStorage.removeItem('vf_user'); return false; }
     currentUser = s.name;
     return true;
@@ -936,6 +1034,17 @@ function showHome() {
   document.getElementById('home-greeting').textContent = `Olá, ${currentUser}`;
   document.getElementById('home-date').textContent = formatDateFull(Date.now());
   updateOnlineBadge();
+  // Google Calendar: auto-load if logged in via Google
+  const stored = JSON.parse(localStorage.getItem('vf_user') || '{}');
+  const calBtn = document.getElementById('btn-calendar');
+  if (stored.googleToken) {
+    if (calBtn) calBtn.style.display = 'none';
+    document.getElementById('calendar-section').style.display = 'block';
+    loadServerCalendarEvents(stored.googleToken);
+  } else {
+    if (calBtn) calBtn.style.display = 'none'; // hide old OAuth button
+    document.getElementById('calendar-section').style.display = 'none';
+  }
   renderHome();
   showScreen('home');
 }
@@ -973,6 +1082,7 @@ function renderMeasurementCard(m) {
   const statusClass = { draft: 'status-draft', pending: 'status-pending', sent: 'status-sent' };
   const canSend = m.status === 'pending' || m.status === 'draft';
   const canEdit = m.status !== 'sent';
+  const canReopen = m.status === 'sent';
   return `
     <div class="measurement-card">
       <div class="card-header">
@@ -983,9 +1093,21 @@ function renderMeasurementCard(m) {
       <div class="card-actions">
         ${canSend ? `<button class="btn-sm btn-send" onclick="sendNow('${m.id}')">Enviar agora</button>` : ''}
         ${canEdit ? `<button class="btn-sm btn-edit" onclick="editMeasurement('${m.id}')">Editar</button>` : ''}
+        ${canReopen ? `<button class="btn-sm" style="background:#fff3e0;color:#e65100;border:1px solid #ffcc80;border-radius:6px;padding:6px 12px;font-size:13px;cursor:pointer;" onclick="reabrirMedicao('${m.id}')">Reabrir</button>` : ''}
         <button class="btn-sm btn-delete" onclick="confirmDelete('${m.id}')">Excluir</button>
       </div>
     </div>`;
+}
+
+function reabrirMedicao(id) {
+  if (!confirm('Reabrir esta medicao para edicao? Ela voltara ao status Rascunho.')) return;
+  const all = getMeasurements();
+  const idx = all.findIndex(m => m.id === id);
+  if (idx === -1) return;
+  all[idx].status = 'draft';
+  saveMeasurements(all);
+  showToast('Medicao reaberta para edicao', 'success');
+  renderHome();
 }
 
 function escHtml(s) {
@@ -1019,7 +1141,39 @@ window.addEventListener('offline', () => { updateOnlineBadge(); });
 // ══════════════════════════════════════════════
 // SEND / SYNC
 // ══════════════════════════════════════════════
-async function sendMeasurement(measurement) {
+// Comprime foto para max 800px / qualidade 60% (~80-150KB)
+async function compressPhoto(dataUrl) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => {
+      const MAX = 800;
+      let w = img.width, h = img.height;
+      if (w > MAX || h > MAX) {
+        if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+        else { w = Math.round(w * MAX / h); h = MAX; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      resolve(canvas.toDataURL('image/jpeg', 0.6));
+    };
+    img.onerror = () => resolve(dataUrl);
+    img.src = dataUrl;
+  });
+}
+
+async function sendMeasurement(measurement, onAttempt) {
+  const locaisComprimidos = measurement.locais.map(l => ({
+    nome: l.nome,
+    trinca: l.trinca, trincaDetalhe: l.trincaDetalhe,
+    juntaFria: l.juntaFria, juntaFriaDetalhe: l.juntaFriaDetalhe,
+    ralo: l.ralo, raloDetalhe: l.raloDetalhe,
+    juntaDilat: l.juntaDilat, juntaDilatDetalhe: l.juntaDilatDetalhe,
+    ferragem: l.ferragem, ferragemDetalhe: l.ferragemDetalhe,
+    cortina: l.cortina, cortinaDetalhe: l.cortinaDetalhe,
+    fotos: (l.fotos || []).map(f => ({ id: f.id, data: f.data }))
+  }));
+
   const payload = {
     id: measurement.id,
     user: measurement.user,
@@ -1031,29 +1185,36 @@ async function sendMeasurement(measurement) {
     ac: measurement.ac,
     celular: measurement.celular,
     obs: measurement.obs,
-    locais: measurement.locais.map(l => ({
-      nome: l.nome,
-      trinca: l.trinca,
-      trincaDetalhe: l.trincaDetalhe,
-      juntaFria: l.juntaFria,
-      juntaFriaDetalhe: l.juntaFriaDetalhe,
-      ralo: l.ralo,
-      raloDetalhe: l.raloDetalhe,
-      juntaDilat: l.juntaDilat,
-      juntaDilatDetalhe: l.juntaDilatDetalhe,
-      ferragem: l.ferragem,
-      ferragemDetalhe: l.ferragemDetalhe,
-      cortina: l.cortina,
-      cortinaDetalhe: l.cortinaDetalhe
-    })),
-    fotos: measurement.fotos
+    locais: locaisComprimidos
   };
-  const response = await fetch(WEBHOOK_URL, {
+
+  if (JSON.stringify(payload).length > 3 * 1024 * 1024) {
+    payload.locais.forEach(l => { l.fotos = []; });
+  }
+
+  const body = JSON.stringify(payload);
+  const PANEL_BASE = WEBHOOK_URL.replace('/api/medicao', '');
+
+  if (onAttempt) onAttempt(1, 1);
+
+  // Dispara o POST sem esperar resposta (pode travar no iOS com SW antigo)
+  fetch(WEBHOOK_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  });
-  return response.ok;
+    body
+  }).catch(() => {});
+
+  // Verifica a cada 3s se o servidor recebeu (GET nunca trava)
+  for (let i = 0; i < 20; i++) {
+    await new Promise(r => setTimeout(r, 3000));
+    try {
+      const r = await fetch(`${PANEL_BASE}/api/medicao/${measurement.id}/ping`);
+      const d = await r.json();
+      if (d.found === true) return true;
+    } catch {}
+  }
+
+  return false;
 }
 
 async function sendNow(id) {
@@ -1104,16 +1265,16 @@ function makeEmptyMeasurement() {
     user: currentUser,
     createdAt: Date.now(),
     cliente: '', endereco: '', cidade: '', cep: '', ac: '', celular: '', obs: '',
-    locais: [],
-    fotos: []
+    locais: []
   };
 }
 
+// CHANGE 2 + 4c — empty strings instead of 0, fotos array added
 function makeEmptyLocal(nome = '') {
-  const loc = { nome };
+  const loc = { nome, fotos: [] };
   SERVICE_TYPES.forEach(st => {
     loc[st.key] = 0;
-    loc[st.key + 'Detalhe'] = [0];
+    loc[st.key + 'Detalhe'] = [''];
   });
   return loc;
 }
@@ -1132,39 +1293,43 @@ function editMeasurement(id) {
 
 function openForm(step) {
   currentStep = step;
+  sessionStorage.setItem('vf_current_measurement', JSON.stringify(currentMeasurement));
   // Reset step 1 fields
   document.getElementById('f-cliente').value = currentMeasurement.cliente || '';
   document.getElementById('f-endereco').value = currentMeasurement.endereco || '';
   document.getElementById('f-cidade').value = currentMeasurement.cidade || '';
   document.getElementById('f-cep').value = currentMeasurement.cep || '';
+  // Trigger ViaCEP lookup if CEP was pre-filled (e.g. from calendar event)
+  if (currentMeasurement.cep) {
+    setTimeout(() => document.getElementById('f-cep').dispatchEvent(new Event('input')), 100);
+  }
   document.getElementById('f-ac').value = currentMeasurement.ac || '';
   document.getElementById('f-celular').value = currentMeasurement.celular || '';
   document.getElementById('f-obs').value = currentMeasurement.obs || '';
 
   // Ensure at least one location
   if (!currentMeasurement.locais || currentMeasurement.locais.length === 0) {
-    currentMeasurement.locais = [makeEmptyLocal('Local 1')];
+    currentMeasurement.locais = [makeEmptyLocal('')];
   }
 
   renderLocations();
-  renderPhotos();
   goToStep(step);
   showScreen('form');
 }
 
 // ══════════════════════════════════════════════
-// FORM NAVIGATION
+// FORM NAVIGATION — CHANGE 4i: 3 steps
 // ══════════════════════════════════════════════
 function goToStep(n) {
   currentStep = n;
   document.querySelectorAll('.form-step').forEach((el, i) => {
     el.classList.toggle('active', i + 1 === n);
   });
-  const titles = ['Dados do cliente', 'Levantamento por local', 'Fotos', 'Resumo e envio'];
+  const titles = ['Dados do cliente', 'Levantamento por local', 'Resumo e envio'];
   document.getElementById('form-step-title').textContent = titles[n - 1];
-  document.getElementById('progress-fill').style.width = (n * 25) + '%';
+  document.getElementById('progress-fill').style.width = (n * 33.33) + '%';
 
-  for (let i = 1; i <= 4; i++) {
+  for (let i = 1; i <= 3; i++) {
     document.getElementById(`slabel-${i}`).className = 'step-label' + (i === n ? ' active' : '');
   }
 
@@ -1176,7 +1341,7 @@ function goToStep(n) {
     bb.className = 'btn-back'; bb.textContent = '← Voltar'; bb.onclick = goBack;
     footer.appendChild(bb);
   }
-  if (n < 4) {
+  if (n < 3) {
     const nb = document.createElement('button');
     nb.className = 'btn-next'; nb.textContent = 'Próximo →'; nb.onclick = goNext;
     footer.appendChild(nb);
@@ -1189,7 +1354,7 @@ function goToStep(n) {
     footer.appendChild(sb);
   }
 
-  if (n === 4) buildSummary();
+  if (n === 3) buildSummary();
   window.scrollTo(0,0);
 }
 
@@ -1201,9 +1366,10 @@ function goBack() {
 function goNext() {
   if (!validateStep(currentStep)) return;
   collectCurrentStep();
-  if (currentStep < 4) goToStep(currentStep + 1);
+  if (currentStep < 3) goToStep(currentStep + 1);
 }
 
+// CHANGE 4j — validate only steps 1 and 2
 function validateStep(n) {
   if (n === 1) {
     const cliente = document.getElementById('f-cliente').value.trim();
@@ -1221,6 +1387,7 @@ function validateStep(n) {
   return true;
 }
 
+// CHANGE 4k — collect only steps 1 and 2
 function collectCurrentStep() {
   if (currentStep === 1) {
     currentMeasurement.cliente = document.getElementById('f-cliente').value.trim();
@@ -1239,14 +1406,20 @@ function collectCurrentStep() {
 // ══════════════════════════════════════════════
 // LOCATIONS (STEP 2)
 // ══════════════════════════════════════════════
+// CHANGE 4n — re-render photos after building cards
 function renderLocations() {
   const container = document.getElementById('locations-list');
   container.innerHTML = '';
   currentMeasurement.locais.forEach((loc, idx) => {
     container.appendChild(buildLocationCard(loc, idx));
   });
+  // Re-render photos for each location
+  currentMeasurement.locais.forEach((loc, idx) => {
+    renderLocationPhotos(idx, loc.fotos || []);
+  });
 }
 
+// CHANGE 4d + 4h — photo section added, data-loc-idx confirmed
 function buildLocationCard(loc, idx) {
   const card = document.createElement('div');
   card.className = 'location-card';
@@ -1255,9 +1428,17 @@ function buildLocationCard(loc, idx) {
   // Header
   const header = document.createElement('div');
   header.className = 'location-card-header';
+  const EXEMPLOS = ['Ex: Vaga 301','Ex: Ao lado da 3ª coluna','Ex: Telhado bloco A','Ex: Subsolo nível -1','Ex: Fachada norte','Ex: Cobertura torre 2'];
+  const exemplo = EXEMPLOS[idx % EXEMPLOS.length];
+  const nomeVal = loc.nome || '';
   header.innerHTML = `
     <div class="location-num">${idx + 1}</div>
-    <input class="location-name-input" type="text" placeholder="Nome do local (ex: Telhado)" value="${escHtml(loc.nome || '')}" data-loc="${idx}" data-field="nome">
+    <input class="location-name-input" type="text"
+      placeholder="${exemplo}"
+      value="${escHtml(nomeVal)}"
+      data-loc="${idx}" data-field="nome"
+      onfocus="if(!this.value.trim())this.value=''"
+      onblur="if(!this.value.trim())this.value=''">
     <button class="btn-remove-location" onclick="removeLocation(${idx})" title="Remover local">✕</button>`;
   card.appendChild(header);
 
@@ -1269,11 +1450,25 @@ function buildLocationCard(loc, idx) {
   });
   card.appendChild(grid);
 
+  // Photo section
+  const photoSection = document.createElement('div');
+  photoSection.className = 'location-photo-section';
+  photoSection.innerHTML = `
+    <div class="location-photo-header">📷 Fotos deste local</div>
+    <button class="btn-add-location-photo" type="button" onclick="triggerLocationPhoto(${idx})">+ Adicionar foto</button>
+    <input type="file" class="location-photo-file" accept="image/*" capture="environment" multiple style="display:none" data-loc="${idx}">
+    <div class="location-photos-grid" data-loc="${idx}"></div>
+  `;
+  card.appendChild(photoSection);
+
+  // Re-render existing photos for this location
+  setTimeout(() => renderLocationPhotos(idx, loc.fotos || []), 0);
+
   return card;
 }
 
 function buildFieldGroup(loc, locIdx, st) {
-  const detail = loc[st.key + 'Detalhe'] || [0];
+  const detail = loc[st.key + 'Detalhe'] || [''];
   const total = sum(detail);
   const wrap = document.createElement('div');
   wrap.className = 'field-group';
@@ -1301,6 +1496,7 @@ function buildFieldGroup(loc, locIdx, st) {
   return wrap;
 }
 
+// CHANGE 2 — empty display instead of 0
 function buildInputRow(val, locIdx, st, rowIdx, totalRows) {
   const row = document.createElement('div');
   row.className = 'input-row';
@@ -1309,7 +1505,8 @@ function buildInputRow(val, locIdx, st, rowIdx, totalRows) {
   input.type = 'number';
   input.min = '0';
   input.step = '0.01';
-  input.value = val;
+  input.value = (val === '' || val === 0 || val === '0') ? '' : val;
+  input.placeholder = '0';
   input.className = 'measure-input';
   input.inputMode = 'decimal';
   input.addEventListener('input', () => recalcField(locIdx, st.key));
@@ -1349,22 +1546,24 @@ function recalcField(locIdx, stKey) {
   fg.querySelector('.field-total').textContent = `= ${totalStr}${st ? st.unit : ''}`;
 }
 
+// CHANGE 2 — use [''] as default
 function addInputToField(locIdx, stKey, afterRowIdx) {
   // Collect current values to rebuild
   collectLocations();
   const loc = currentMeasurement.locais[locIdx];
-  const detail = [...(loc[stKey + 'Detalhe'] || [0])];
-  detail.splice(afterRowIdx + 1, 0, 0);
+  const detail = [...(loc[stKey + 'Detalhe'] || [''])];
+  detail.splice(afterRowIdx + 1, 0, '');
   loc[stKey + 'Detalhe'] = detail;
   loc[stKey] = sum(detail);
   // Rebuild just this field group
   rebuildFieldGroup(locIdx, stKey);
 }
 
+// CHANGE 2 — use [''] as default
 function removeInputFromField(locIdx, stKey, rowIdx) {
   collectLocations();
   const loc = currentMeasurement.locais[locIdx];
-  const detail = [...(loc[stKey + 'Detalhe'] || [0])];
+  const detail = [...(loc[stKey + 'Detalhe'] || [''])];
   if (detail.length <= 1) return;
   detail.splice(rowIdx, 1);
   loc[stKey + 'Detalhe'] = detail;
@@ -1372,12 +1571,13 @@ function removeInputFromField(locIdx, stKey, rowIdx) {
   rebuildFieldGroup(locIdx, stKey);
 }
 
+// CHANGE 2 — use [''] as default
 function rebuildFieldGroup(locIdx, stKey) {
   const fg = getFieldGroup(locIdx, stKey);
   if (!fg) return;
   const loc = currentMeasurement.locais[locIdx];
   const st = SERVICE_TYPES.find(s => s.key === stKey);
-  const detail = loc[stKey + 'Detalhe'] || [0];
+  const detail = loc[stKey + 'Detalhe'] || [''];
   const total = sum(detail);
 
   // Rebuild inputs container
@@ -1392,8 +1592,7 @@ function rebuildFieldGroup(locIdx, stKey) {
 
 function addLocation() {
   collectLocations();
-  const num = currentMeasurement.locais.length + 1;
-  currentMeasurement.locais.push(makeEmptyLocal(`Local ${num}`));
+  currentMeasurement.locais.push(makeEmptyLocal(''));
   renderLocations();
   // Scroll to bottom
   const container = document.getElementById('locations-list');
@@ -1426,58 +1625,88 @@ function collectLocations() {
       loc[st.key + 'Detalhe'] = detail;
       loc[st.key] = sum(detail);
     });
+    // Photos are already in loc.fotos — no need to re-collect
   });
+  sessionStorage.setItem('vf_current_measurement', JSON.stringify(currentMeasurement));
 }
 
 // ══════════════════════════════════════════════
-// PHOTOS (STEP 3)
+// CHANGE 4f — Per-location photo functions
 // ══════════════════════════════════════════════
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('photo-file-input').addEventListener('change', handlePhotoSelect);
-});
+function triggerLocationPhoto(locIdx) {
+  const card = document.querySelector(`.location-card[data-loc-idx="${locIdx}"]`);
+  if (!card) return;
+  const input = card.querySelector('.location-photo-file');
+  if (input) input.click();
+}
 
-function handlePhotoSelect(e) {
+function handleLocationPhotoSelect(e) {
+  const locIdx = parseInt(e.target.dataset.loc);
   const files = Array.from(e.target.files);
   if (!files.length) return;
-  const locName = document.getElementById('photo-location-name').value.trim() || 'Sem local';
-  let processed = 0;
+  // Restaurar medição do sessionStorage se perdida
+  if (!currentMeasurement || !currentMeasurement.locais) {
+    const saved = sessionStorage.getItem('vf_current_measurement');
+    if (saved) try { currentMeasurement = JSON.parse(saved); } catch {}
+  }
+  const loc = currentMeasurement.locais[locIdx];
+  if (!loc) return;
+  if (!loc.fotos) loc.fotos = [];
+  let done = 0;
+
   files.forEach(file => {
     const reader = new FileReader();
     reader.onload = ev => {
-      currentMeasurement.fotos.push({ id: genId(), label: locName, data: ev.target.result });
-      processed++;
-      if (processed === files.length) renderPhotos();
+      const dataUrl = ev.target.result;
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 800;
+        let w = img.width, h = img.height;
+        if (w > MAX || h > MAX) {
+          if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+          else { w = Math.round(w * MAX / h); h = MAX; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        const compressed = canvas.toDataURL('image/jpeg', 0.6);
+        loc.fotos.push({ id: genId(), data: compressed });
+        done++;
+        if (done === files.length) renderLocationPhotos(locIdx, loc.fotos);
+      };
+      img.onerror = () => {
+        // Canvas falhou — guardar base64 original sem compressão
+        loc.fotos.push({ id: genId(), data: dataUrl });
+        done++;
+        if (done === files.length) renderLocationPhotos(locIdx, loc.fotos);
+      };
+      img.src = dataUrl;
     };
     reader.readAsDataURL(file);
   });
   e.target.value = '';
 }
 
-function renderPhotos() {
-  const grid = document.getElementById('photos-grid');
-  const empty = document.getElementById('photos-empty');
-  const fotos = currentMeasurement.fotos || [];
-  if (fotos.length === 0) {
-    grid.innerHTML = '';
-    empty.style.display = 'block';
-    return;
-  }
-  empty.style.display = 'none';
+function renderLocationPhotos(locIdx, fotos) {
+  const grid = document.querySelector(`.location-photos-grid[data-loc="${locIdx}"]`);
+  if (!grid) return;
+  if (!fotos || fotos.length === 0) { grid.innerHTML = ''; return; }
   grid.innerHTML = fotos.map((f, i) => `
-    <div class="photo-thumb">
-      <img src="${f.data}" alt="${escHtml(f.label)}" loading="lazy">
-      <div class="photo-label-overlay">${escHtml(f.label)}</div>
-      <button class="btn-remove-photo" onclick="removePhoto(${i})">×</button>
+    <div class="photo-thumb" style="aspect-ratio:1;">
+      <img src="${f.data}" alt="foto" loading="lazy">
+      <button class="btn-remove-photo" onclick="removeLocationPhoto(${locIdx}, ${i})">×</button>
     </div>`).join('');
 }
 
-function removePhoto(idx) {
-  currentMeasurement.fotos.splice(idx, 1);
-  renderPhotos();
+function removeLocationPhoto(locIdx, photoIdx) {
+  const loc = currentMeasurement.locais[locIdx];
+  if (!loc || !loc.fotos) return;
+  loc.fotos.splice(photoIdx, 1);
+  renderLocationPhotos(locIdx, loc.fotos);
 }
 
 // ══════════════════════════════════════════════
-// SUMMARY (STEP 4)
+// CHANGE 4l — Summary (3 steps, fotos per location)
 // ══════════════════════════════════════════════
 function buildSummary() {
   // Collect step 2 data before showing summary
@@ -1488,7 +1717,8 @@ function buildSummary() {
   document.getElementById('sum-cidade').textContent = currentMeasurement.cidade || '—';
   document.getElementById('sum-date').textContent = formatDate(currentMeasurement.createdAt);
   document.getElementById('sum-locais').textContent = currentMeasurement.locais.length + ' local(is)';
-  document.getElementById('sum-fotos').textContent = (currentMeasurement.fotos || []).length + ' foto(s)';
+  const totalFotos = currentMeasurement.locais.reduce((a, l) => a + (l.fotos || []).length, 0);
+  document.getElementById('sum-fotos').textContent = totalFotos + ' foto(s)';
 
   const totalsDiv = document.getElementById('summary-totals');
   totalsDiv.innerHTML = SERVICE_TYPES.map(st => {
@@ -1505,6 +1735,12 @@ function buildSummary() {
 // ══════════════════════════════════════════════
 // SAVE / SUBMIT
 // ══════════════════════════════════════════════
+function showSuccessScreen(m) {
+  document.getElementById('success-cliente').textContent = m.cliente || '';
+  document.getElementById('success-cidade').textContent = m.cidade || '';
+  showScreen('success');
+}
+
 function saveDraft() {
   collectLocations();
   currentMeasurement.status = 'draft';
@@ -1515,32 +1751,145 @@ function saveDraft() {
 
 async function submitMeasurement() {
   collectLocations();
-  if (!navigator.onLine) {
-    currentMeasurement.status = 'pending';
-    upsertMeasurement(currentMeasurement);
-    showToast('Sem conexão. Medição salva e será enviada quando online.', 'info');
-    showHome();
-    return;
-  }
+
+  const btn = document.querySelector('.btn-submit');
+  const setBtn = (txt, dis) => { if (btn) { btn.textContent = txt; btn.disabled = dis; } };
+
+  setBtn('Comprimindo fotos...', true);
+
   try {
-    const ok = await sendMeasurement(currentMeasurement);
+    if (!navigator.onLine) {
+      currentMeasurement.status = 'pending';
+      upsertMeasurement(currentMeasurement);
+      showToast('Sem conexão. Medição salva — será enviada automaticamente quando voltar online.', 'info');
+      showHome();
+      return;
+    }
+
+    setBtn('Enviando... (1/3)', true);
+    const ok = await sendMeasurement(currentMeasurement, (attempt, total) => {
+      setBtn(`Enviando... (${attempt}/${total})`, true);
+    });
+
     if (ok) {
       currentMeasurement.status = 'sent';
       upsertMeasurement(currentMeasurement);
-      showToast('Medição enviada com sucesso!', 'success');
-      showHome();
+      showSuccessScreen(currentMeasurement);
     } else {
       currentMeasurement.status = 'pending';
       upsertMeasurement(currentMeasurement);
-      showToast('Erro ao enviar. Medição salva como pendente.', 'error');
-      showHome();
+      showToast('Falha no servidor. Medição salva como pendente.', 'error');
+      setBtn('✓ Enviar Medição', false);
     }
-  } catch {
+  } catch(err) {
+    console.error('Send error:', err);
     currentMeasurement.status = 'pending';
     upsertMeasurement(currentMeasurement);
-    showToast('Erro de conexão. Medição salva como pendente.', 'error');
-    showHome();
+    const msg = err.name === 'AbortError'
+      ? 'Tempo esgotado. Medição salva — tente enviar pelo histórico.'
+      : 'Sem conexão. Medição salva como pendente.';
+    showToast(msg, 'error');
+    setBtn('✓ Enviar Medição', false);
   }
+}
+
+// ══════════════════════════════════════════════
+// CHANGE 6d — Google Calendar functions
+// ══════════════════════════════════════════════
+async function connectGoogleCalendar() {
+  if (GOOGLE_CLIENT_ID === 'SEU_GOOGLE_CLIENT_ID_AQUI') {
+    showToast('Configure o GOOGLE_CLIENT_ID para usar esta função.', 'info');
+    return;
+  }
+  // OAuth implicit flow
+  const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
+    `client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(location.origin + location.pathname)}&` +
+    `response_type=token&scope=${encodeURIComponent(GOOGLE_SCOPES)}`;
+
+  // Open OAuth popup
+  const popup = window.open(authUrl, 'google-auth', 'width=500,height=600');
+
+  // Listen for redirect with token
+  const checkPopup = setInterval(() => {
+    try {
+      const url = popup.location.href;
+      if (url.includes('access_token=')) {
+        const params = new URLSearchParams(url.split('#')[1]);
+        googleAccessToken = params.get('access_token');
+        clearInterval(checkPopup);
+        popup.close();
+        loadCalendarEvents();
+        document.getElementById('btn-calendar').style.display = 'none';
+        document.getElementById('calendar-section').style.display = 'block';
+      }
+    } catch {}
+    if (popup.closed) clearInterval(checkPopup);
+  }, 500);
+}
+
+async function loadCalendarEvents() {
+  if (!googleAccessToken) return;
+  try {
+    const now = new Date().toISOString();
+    const maxTime = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+    const r = await fetch(
+      `https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${now}&timeMax=${maxTime}&maxResults=10&singleEvents=true&orderBy=startTime`,
+      { headers: { Authorization: `Bearer ${googleAccessToken}` } }
+    );
+    const data = await r.json();
+    const container = document.getElementById('calendar-events');
+    if (!data.items || data.items.length === 0) {
+      container.innerHTML = '<div class="empty-state">Sem agendamentos nos próximos 7 dias</div>';
+      return;
+    }
+    container.innerHTML = data.items.map((ev, i) => {
+      const start = ev.start.dateTime || ev.start.date;
+      const date = new Date(start);
+      const timeStr = ev.start.dateTime
+        ? date.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit' }) + ' ' + date.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' })
+        : date.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit' });
+      return `<div class="calendar-event-card" onclick="startFromCalendarEvent(${i})" data-ev='${JSON.stringify({ title: ev.summary || '', location: ev.location || '', time: timeStr }).replace(/'/g, "&apos;")}'>
+        <div class="calendar-event-title">${escHtml(ev.summary || '(sem título)')}</div>
+        <div class="calendar-event-time">📅 ${timeStr}</div>
+        ${ev.location ? `<div class="calendar-event-location">📍 ${escHtml(ev.location)}</div>` : ''}
+      </div>`;
+    }).join('');
+    // Store events globally for access
+    window._calendarEvents = data.items;
+  } catch(e) {
+    showToast('Erro ao carregar agenda.', 'error');
+  }
+}
+
+function startFromCalendarEvent(idx) {
+  const ev = window._calendarEvents && window._calendarEvents[idx];
+  if (!ev) { startNewMeasurement(); return; }
+
+  currentMeasurement = makeEmptyMeasurement();
+  // ev.title from server (mapped from summary), ev.description for AC/phone
+  currentMeasurement.cliente = ev.title || ev.summary || '';
+  if (ev.location) {
+    const cepMatch = ev.location.match(/\d{5}-\d{3}/);
+    if (cepMatch) currentMeasurement.cep = cepMatch[0];
+    // Strip CEP, country suffix, then parse street + city
+    let addr = ev.location
+      .replace(/,?\s*\d{5}-\d{3}/, '')
+      .replace(/,?\s*Brasi[l]?[ia]?[^\s,]*/i, '')
+      .replace(/,?\s*Brazil/i, '')
+      .trim().replace(/,$/, '').trim();
+    const parts = addr.split(',');
+    currentMeasurement.endereco = parts.slice(0, 2).join(',').trim();
+    // Last part may be "Cidade - UF" — strip state abbreviation
+    const cidadePart = (parts[parts.length - 1] || '').trim().replace(/\s*[-–]\s*[A-Z]{2}$/, '').trim();
+    currentMeasurement.cidade = cidadePart;
+  }
+  const desc = ev.description || '';
+  const acMatch = desc.match(/AC[:\s]+([^\n]+)/i);
+  const telMatch = desc.match(/(?:cel|tel|fone|celular|telefone)[:\s]+([0-9\s()\-+]+)/i);
+  if (acMatch) currentMeasurement.ac = acMatch[1].trim();
+  if (telMatch) currentMeasurement.celular = telMatch[1].trim();
+  openForm(1);
+  showToast('Formulário pré-preenchido com dados da agenda!', 'success');
 }
 
 // ══════════════════════════════════════════════
@@ -1548,8 +1897,21 @@ async function submitMeasurement() {
 // ══════════════════════════════════════════════
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').then(reg => {
-      // Listen for sync messages from SW
+    // updateViaCache:'none' garante que o browser sempre busca o sw.js mais novo
+    navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then(reg => {
+      // Se já há um SW novo esperando, manda ativar imediatamente
+      function activateWaiting(worker) {
+        if (!worker) return;
+        worker.postMessage({ type: 'SKIP_WAITING' });
+      }
+      if (reg.waiting) activateWaiting(reg.waiting);
+      reg.addEventListener('updatefound', () => {
+        const novo = reg.installing;
+        novo && novo.addEventListener('statechange', () => {
+          if (novo.state === 'installed') activateWaiting(novo);
+        });
+      });
+
       navigator.serviceWorker.addEventListener('message', e => {
         if (e.data && e.data.type === 'SYNC_MEASUREMENTS') syncPendingMeasurements();
       });
@@ -1561,11 +1923,78 @@ if ('serviceWorker' in navigator) {
 // INIT
 // ══════════════════════════════════════════════
 window.addEventListener('DOMContentLoaded', () => {
+  // Check for Google token returned from OAuth redirect
+  const hash = window.location.hash;
+  if (hash && hash.includes('google_token=')) {
+    const params = new URLSearchParams(hash.substring(1));
+    const googleToken = params.get('google_token');
+    const googleName = decodeURIComponent(params.get('google_name') || '');
+    const googleEmail = decodeURIComponent(params.get('google_email') || '');
+    if (googleToken) {
+      const expiresAt = Date.now() + 7 * 24 * 60 * 60 * 1000;
+      const fallback = googleName || googleEmail;
+      // Salva provisoriamente com nome do Google e mostra a home
+      localStorage.setItem('vf_user', JSON.stringify({ name: fallback, expiresAt, googleToken, googleEmail }));
+      currentUser = fallback;
+      window.history.replaceState(null, '', window.location.pathname);
+      showHome();
+      // Tenta buscar o nome cadastrado no servidor; atualiza se obtiver um
+      fetchRegisteredName(googleToken, fallback).then(registeredName => {
+        if (registeredName && registeredName !== fallback) {
+          currentUser = registeredName;
+          const stored = JSON.parse(localStorage.getItem('vf_user') || '{}');
+          stored.name = registeredName;
+          localStorage.setItem('vf_user', JSON.stringify(stored));
+          document.getElementById('home-greeting').textContent = `Olá, ${registeredName}`;
+        }
+      });
+      return;
+    }
+  }
   if (checkSession()) {
     showHome();
   } else {
     showScreen('login');
   }
+
+  // Check for Google token returned from OAuth redirect — fetch registered name from server
+  async function fetchRegisteredName(token, fallbackName) {
+    const PANEL_BASE = WEBHOOK_URL.replace('/api/medicao', '');
+    try {
+      const r = await fetch(`${PANEL_BASE}/api/usuarios/me`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (r.ok) {
+        const data = await r.json();
+        if (data && data.name) return data.name;
+      }
+    } catch {}
+    return fallbackName;
+  }
+
+  // CHANGE 1 — CEP auto-fill
+  document.getElementById('f-cep').addEventListener('input', async function() {
+    const cep = this.value.replace(/\D/g, '');
+    if (cep.length === 8) {
+      try {
+        const r = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+        const d = await r.json();
+        if (!d.erro) {
+          if (d.logradouro) document.getElementById('f-endereco').value = d.logradouro;
+          document.getElementById('f-cidade').value = (d.localidade || '') + (d.uf ? ' - ' + d.uf : '');
+          this.value = cep.replace(/(\d{5})(\d{3})/, '$1-$2');
+          showToast('CEP encontrado: ' + d.localidade + ' - ' + d.uf, 'success');
+        }
+      } catch {}
+    }
+  });
+
+  // CHANGE 4g — event delegation for location photo inputs
+  document.getElementById('locations-list').addEventListener('change', e => {
+    if (e.target.classList.contains('location-photo-file')) {
+      handleLocationPhotoSelect(e);
+    }
+  });
 });
 </script>
 </body>
