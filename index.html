@@ -6,16 +6,16 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Vedafácil">
-  <meta name="theme-color" content="#1a5c9a">
+  <meta name="theme-color" content="#e87722">
   <title>Vedafácil Medidor</title>
   <link rel="manifest" href="./manifest.json">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --primary: #1a5c9a;
-      --primary-dark: #124272;
-      --primary-light: #e8f1f9;
+      --primary: #e87722;
+      --primary-dark: #c45d12;
+      --primary-light: #fff3e0;
       --success: #2e7d32;
       --success-light: #e8f5e9;
       --danger: #c62828;
@@ -181,7 +181,7 @@
       color: white;
       border: none;
       border-radius: var(--radius);
-      font-size: 17px;
+      font-size: 18px;
       font-weight: 700;
       cursor: pointer;
       margin-bottom: 20px;
@@ -192,7 +192,7 @@
     .btn-new:active { background: var(--primary-dark); }
 
     .section-title {
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.5px;
@@ -208,7 +208,7 @@
       margin-bottom: 10px;
     }
     .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
-    .card-client { font-weight: 700; font-size: 15px; color: var(--gray-900); }
+    .card-client { font-weight: 700; font-size: 16px; color: var(--gray-900); }
     .card-date { font-size: 12px; color: var(--gray-500); }
     .status-badge {
       display: inline-block;
@@ -222,12 +222,12 @@
     .status-draft { background: var(--gray-200); color: var(--gray-700); }
     .status-pending { background: var(--warning-light); color: var(--warning); }
     .status-sent { background: var(--success-light); color: var(--success); }
-    .card-city { font-size: 13px; color: var(--gray-600); margin: 4px 0 10px; }
+    .card-city { font-size: 14px; color: var(--gray-600); margin: 4px 0 10px; }
     .card-actions { display: flex; gap: 8px; flex-wrap: wrap; }
     .btn-sm {
       padding: 7px 14px;
       border-radius: 8px;
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 600;
       border: none;
       cursor: pointer;
@@ -239,7 +239,7 @@
     .btn-edit { background: var(--gray-100); color: var(--gray-800); border: 1px solid var(--gray-300); }
     .btn-delete { background: var(--danger-light); color: var(--danger); }
 
-    .empty-state { text-align: center; color: var(--gray-500); font-size: 14px; padding: 16px 0; }
+    .empty-state { text-align: center; color: var(--gray-500); font-size: 15px; padding: 16px 0; }
 
     .logout-link {
       display: block;
@@ -294,7 +294,7 @@
     .form-group { margin-bottom: 16px; }
     .form-label {
       display: block;
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 600;
       color: var(--gray-700);
       margin-bottom: 6px;
@@ -388,7 +388,7 @@
 
     .field-group { display: flex; flex-direction: column; gap: 4px; }
     .field-label {
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 600;
       color: var(--gray-600);
       text-transform: uppercase;
@@ -547,8 +547,8 @@
     .summary-title { font-size: 14px; font-weight: 700; color: var(--gray-600); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.3px; }
     .summary-row { display: flex; justify-content: space-between; align-items: baseline; padding: 5px 0; border-bottom: 1px solid var(--gray-100); }
     .summary-row:last-child { border-bottom: none; }
-    .summary-row-label { font-size: 14px; color: var(--gray-600); }
-    .summary-row-value { font-size: 15px; font-weight: 700; color: var(--gray-900); }
+    .summary-row-label { font-size: 15px; color: var(--gray-600); }
+    .summary-row-value { font-size: 16px; font-weight: 700; color: var(--gray-900); }
     .summary-total-row { background: var(--primary-light); border-radius: 8px; padding: 8px 10px; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
     .summary-total-label { font-size: 14px; color: var(--primary); font-weight: 600; }
     .summary-total-value { font-size: 16px; font-weight: 800; color: var(--primary); }
@@ -645,6 +645,50 @@
     .toast.error { background: var(--danger); }
     .toast.info { background: var(--info); }
 
+    /* Radio groups — Garantia / Andaime */
+    .radio-group { display: flex; gap: 10px; }
+    .radio-option {
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 10px 14px; border: 1.5px solid var(--gray-300); border-radius: 8px;
+      cursor: pointer; transition: all 0.15s; flex: 1; font-size: 15px; font-weight: 500;
+      color: var(--gray-700); background: white;
+    }
+    .radio-option.selected {
+      border-color: var(--primary); background: var(--primary-light);
+      color: var(--primary); font-weight: 700;
+    }
+    .radio-option input[type="radio"] { display: none; }
+
+    /* Calendar toggle Dia/Semana */
+    .cal-view-bar {
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;
+    }
+    .cal-toggle { display: flex; border: 1.5px solid var(--gray-300); border-radius: 8px; overflow: hidden; }
+    .cal-toggle-btn {
+      padding: 5px 14px; border: none; background: white; color: var(--gray-600);
+      font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s;
+    }
+    .cal-toggle-btn.active { background: var(--primary); color: white; }
+
+    /* Day navigation */
+    .cal-day-nav {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+      background: var(--gray-100); border-radius: 8px; padding: 6px 10px;
+    }
+    .cal-day-nav button {
+      padding: 4px 10px; background: white; border: 1px solid var(--gray-300);
+      border-radius: 6px; cursor: pointer; font-size: 14px;
+    }
+    .cal-day-label { flex: 1; text-align: center; font-size: 14px; font-weight: 600; color: var(--gray-800); }
+
+    /* CONCLUIR button */
+    .btn-concluir {
+      flex: 2; padding: 14px; background: var(--primary); color: white; border: none;
+      border-radius: var(--radius); font-size: 17px; font-weight: 700; cursor: pointer;
+      min-height: 52px; transition: background 0.15s;
+    }
+    .btn-concluir:active { background: var(--primary-dark); }
+
     /* CHANGE 6c — Google Calendar */
     .btn-calendar {
       display: flex;
@@ -690,10 +734,11 @@
     <div class="login-title">Vedafácil</div>
     <div class="login-subtitle">Entre com sua conta Google</div>
 
-    <button class="login-btn" onclick="doLoginGoogle()" style="background:white;color:#333;border:1.5px solid #ddd;display:flex;align-items:center;justify-content:center;gap:10px;font-size:15px;margin-bottom:20px;">
+    <button class="login-btn" id="btn-login-google" onclick="doLoginGoogle()" style="background:white;color:#333;border:1.5px solid #ddd;display:flex;align-items:center;justify-content:center;gap:10px;font-size:15px;margin-bottom:0;">
       <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/><path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/><path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24c0 3.55.85 6.91 2.34 9.88l7.35-5.7z"/><path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/></svg>
-      Entrar com Google
+      <span id="btn-login-google-text">Entrar com Google</span>
     </button>
+    <p id="login-google-error" style="display:none;color:rgba(255,200,150,0.95);font-size:13px;margin-top:14px;line-height:1.5;"></p>
   </div>
 </div>
 
@@ -725,7 +770,18 @@
 
     <!-- CHANGE 6b — Google Calendar section -->
     <div id="calendar-section" style="display:none;">
-      <div class="section-title" style="margin-top:4px;">Próximos agendamentos</div>
+      <div class="cal-view-bar">
+        <div class="section-title" style="margin-bottom:0;">Agendamentos</div>
+        <div class="cal-toggle">
+          <button class="cal-toggle-btn" id="cal-btn-dia" onclick="setCalendarView('dia')">Dia</button>
+          <button class="cal-toggle-btn active" id="cal-btn-semana" onclick="setCalendarView('semana')">Semana</button>
+        </div>
+      </div>
+      <div class="cal-day-nav" id="cal-day-nav" style="display:none;">
+        <button onclick="changeDay(-1)">◀</button>
+        <span class="cal-day-label" id="cal-day-label"></span>
+        <button onclick="changeDay(1)">▶</button>
+      </div>
       <div id="calendar-events"></div>
     </div>
     <button class="btn-calendar" id="btn-calendar" onclick="connectGoogleCalendar()" style="display:none;">
@@ -777,23 +833,49 @@
         <label class="form-label">Endereço</label>
         <input class="form-input" id="f-endereco" type="text" placeholder="Rua, número">
       </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Cidade <span class="req">*</span></label>
-          <input class="form-input" id="f-cidade" type="text" placeholder="Cidade">
-        </div>
-        <div class="form-group">
-          <label class="form-label">AC</label>
-          <input class="form-input" id="f-ac" type="text" placeholder="AC">
-        </div>
+      <div class="form-group">
+        <label class="form-label">Bairro</label>
+        <input class="form-input" id="f-bairro" type="text" placeholder="Bairro">
       </div>
       <div class="form-group">
-        <label class="form-label">Celular</label>
+        <label class="form-label">Cidade <span class="req">*</span></label>
+        <input class="form-input" id="f-cidade" type="text" placeholder="Cidade">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Responsável <span style="font-size:12px;color:var(--gray-500)">(síndico/zelador)</span></label>
+        <input class="form-input" id="f-ac" type="text" placeholder="Responsável (síndico/zelador)">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Celular do Responsável</label>
         <input class="form-input" id="f-celular" type="tel" placeholder="(00) 00000-0000">
       </div>
       <div class="form-group">
-        <label class="form-label">Observações</label>
-        <textarea class="form-input" id="f-obs" rows="3" placeholder="Observações gerais..." style="resize:vertical;"></textarea>
+        <label class="form-label">Avaliado por</label>
+        <div id="f-avaliado-por" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;">
+          <label style="display:flex;align-items:center;gap:6px;font-size:15px;padding:8px 12px;background:#f8f9fa;border:1px solid #dee2e6;border-radius:8px;cursor:pointer;">
+            <input type="checkbox" name="avaliado" value="Thiago"> Thiago
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:15px;padding:8px 12px;background:#f8f9fa;border:1px solid #dee2e6;border-radius:8px;cursor:pointer;">
+            <input type="checkbox" name="avaliado" value="Alan"> Alan
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:15px;padding:8px 12px;background:#f8f9fa;border:1px solid #dee2e6;border-radius:8px;cursor:pointer;">
+            <input type="checkbox" name="avaliado" value="Fernando"> Fernando
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:15px;padding:8px 12px;background:#f8f9fa;border:1px solid #dee2e6;border-radius:8px;cursor:pointer;">
+            <input type="checkbox" name="avaliado" value="Daniel"> Daniel
+          </label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Garantia</label>
+        <div class="radio-group" id="f-garantia">
+          <label class="radio-option selected" onclick="setRadio('f-garantia','15',this)">
+            <input type="radio" name="garantia" value="15" checked> 🛡️ 15 anos
+          </label>
+          <label class="radio-option" onclick="setRadio('f-garantia','7',this)">
+            <input type="radio" name="garantia" value="7"> 🛡️ 7 anos
+          </label>
+        </div>
       </div>
     </div>
 
@@ -815,10 +897,55 @@
         <div class="summary-row"><span class="summary-row-label">Data</span><span class="summary-row-value" id="sum-date">—</span></div>
         <div class="summary-row"><span class="summary-row-label">Locais</span><span class="summary-row-value" id="sum-locais">—</span></div>
         <div class="summary-row"><span class="summary-row-label">Fotos</span><span class="summary-row-value" id="sum-fotos">—</span></div>
+        <div class="summary-row"><span class="summary-row-label">Avaliado por</span><span class="summary-row-value" id="sum-avaliado-por">—</span></div>
+        <div class="summary-row"><span class="summary-row-label">Garantia</span><span class="summary-row-value" id="sum-garantia">15 anos</span></div>
       </div>
       <div class="summary-card">
         <div class="summary-title">Totais por serviço</div>
         <div id="summary-totals"></div>
+      </div>
+      <!-- ANDAIME — M6: movido do Step 1 para cá -->
+      <div class="summary-card">
+        <div class="summary-title">🏗️ Andaime</div>
+        <div style="margin-bottom:12px;">
+          <div class="radio-group" id="f-andaime">
+            <label class="radio-option" onclick="setRadio('f-andaime','sim',this);toggleAndaimeExtra(true)">
+              <input type="radio" name="andaime" value="sim"> 🏗️ Sim
+            </label>
+            <label class="radio-option selected" onclick="setRadio('f-andaime','nao',this);toggleAndaimeExtra(false)">
+              <input type="radio" name="andaime" value="nao" checked> ✅ Não
+            </label>
+          </div>
+        </div>
+        <div id="andaime-extra" style="display:none;">
+          <div class="form-group" style="margin-bottom:12px;">
+            <label class="form-label">Metros de Andaime</label>
+            <input class="form-input" id="f-andaime-metros" type="number" min="0" step="0.5" placeholder="Ex: 30">
+          </div>
+          <div style="display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap;">
+            <label style="display:flex;align-items:center;gap:8px;font-size:15px;padding:8px 12px;background:#f8f9fa;border:1px solid #dee2e6;border-radius:8px;cursor:pointer;">
+              <input type="checkbox" id="f-andaime-rodinhas"> Rodinhas
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:15px;padding:8px 12px;background:#f8f9fa;border:1px solid #dee2e6;border-radius:8px;cursor:pointer;">
+              <input type="checkbox" id="f-andaime-bases"> Bases Ajustáveis
+            </label>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Largura do Andaime</label>
+            <div class="radio-group" id="f-andaime-largura">
+              <label class="radio-option selected" onclick="setRadio('f-andaime-largura','1m',this)">
+                <input type="radio" name="andaime-largura" value="1m" checked> 1m
+              </label>
+              <label class="radio-option" onclick="setRadio('f-andaime-largura','1.5m',this)">
+                <input type="radio" name="andaime-largura" value="1.5m"> 1,5m
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Observações gerais</label>
+        <textarea class="form-input" id="f-obs" rows="3" placeholder="Informações adicionais sobre a medição..." style="resize:vertical;"></textarea>
       </div>
     </div>
 
@@ -877,6 +1004,8 @@ const SERVICE_TYPES = [
 let currentUser = null;
 let currentStep = 1;
 let currentMeasurement = null; // measurement being edited/created
+let calendarView = 'semana'; // 'dia' ou 'semana'
+let calendarSelectedDay = null; // null = hoje
 
 // ══════════════════════════════════════════════
 // UTILS
@@ -895,8 +1024,35 @@ function formatDateFull(ts) {
   return d.toLocaleDateString('pt-BR', { weekday:'long', day:'2-digit', month:'long', year:'numeric' });
 }
 
+// ── Radio helpers ──
+function setRadio(groupId, value, el) {
+  const group = document.getElementById(groupId);
+  if (!group) return;
+  group.querySelectorAll('.radio-option').forEach(opt => opt.classList.remove('selected'));
+  el.classList.add('selected');
+  const input = el.querySelector('input[type="radio"]');
+  if (input) input.checked = true;
+}
+
+function setRadioValue(groupId, value) {
+  const group = document.getElementById(groupId);
+  if (!group) return;
+  group.querySelectorAll('.radio-option').forEach(opt => {
+    const input = opt.querySelector('input[type="radio"]');
+    if (!input) return;
+    const sel = input.value === value;
+    opt.classList.toggle('selected', sel);
+    input.checked = sel;
+  });
+}
+
 function sum(arr) {
   return arr.reduce((a, b) => a + (parseFloat(b) || 0), 0);
+}
+
+function toggleAndaimeExtra(show) {
+  const el = document.getElementById('andaime-extra');
+  if (el) el.style.display = show ? 'block' : 'none';
 }
 
 // ══════════════════════════════════════════════
@@ -930,7 +1086,7 @@ function showScreen(id) {
 // AUTH
 // ══════════════════════════════════════════════
 function doLogin(name) {
-  const expiresAt = Date.now() + 8 * 60 * 60 * 1000;
+  const expiresAt = Date.now() + 30 * 24 * 60 * 60 * 1000; // 30 dias
   localStorage.setItem('vf_user', JSON.stringify({ name, expiresAt }));
   currentUser = name;
   showHome();
@@ -944,6 +1100,7 @@ function doLogout() {
 
 function doLoginGoogle() {
   const PANEL_BASE = WEBHOOK_URL.replace('/api/medicao', '');
+  // Vai direto para o OAuth do Google — sem pré-verificação que pode falhar por CORS
   window.location.href = `${PANEL_BASE}/api/auth/google?source=medidor`;
 }
 
@@ -972,22 +1129,78 @@ function renderCalendarEventsFromServer(events, container) {
     return;
   }
   window._calendarEvents = events;
-  container.innerHTML = events.map((ev, i) => {
-    // Server returns flat: ev.title (from summary), ev.start (string), ev.location
+  renderCalendarEventsFiltered();
+}
+
+function renderCalendarEventsFiltered() {
+  const container = document.getElementById('calendar-events');
+  if (!container) return;
+  const events = window._calendarEvents;
+  if (!events || events.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:12px;color:#888;font-size:13px;">Sem agendamentos</div>';
+    return;
+  }
+
+  // Filter by view
+  let filtered = events;
+  const now = new Date();
+  if (calendarView === 'dia') {
+    const day = calendarSelectedDay || new Date();
+    const y = day.getFullYear(), m = day.getMonth(), d = day.getDate();
+    filtered = events.filter(ev => {
+      if (!ev.start) return false;
+      const evDate = new Date(ev.start);
+      return evDate.getFullYear() === y && evDate.getMonth() === m && evDate.getDate() === d;
+    });
+    // Update day nav label
+    const label = document.getElementById('cal-day-label');
+    if (label) label.textContent = day.toLocaleDateString('pt-BR', { weekday:'short', day:'2-digit', month:'2-digit' });
+  }
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:12px;color:#888;font-size:13px;">Nenhum agendamento para este período</div>';
+    return;
+  }
+
+  container.innerHTML = filtered.map((ev, i) => {
+    const realIdx = events.indexOf(ev);
     const date = ev.start ? new Date(ev.start) : null;
+    const isLate = date && !isNaN(date) && date < now && ev.start.includes('T');
     const timeStr = date && !isNaN(date)
       ? date.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit' }) + (ev.start.includes('T') ? ' ' + date.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' }) : '')
       : '';
-    return `<div class="calendar-event-card">
-      <div class="calendar-event-title">${escHtml(ev.title || '(sem título)')}</div>
-      ${timeStr ? `<div class="calendar-event-time">📅 ${timeStr}</div>` : ''}
+    const mapsUrl = ev.location ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(ev.location)}` : null;
+    return `<div class="calendar-event-card" style="${isLate ? 'border-left-color:#c62828;' : ''}">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
+        <div class="calendar-event-title" style="${isLate ? 'color:#c62828;' : ''}">${escHtml(ev.title || '(sem título)')}</div>
+        ${isLate ? '<span style="background:#ffebee;color:#c62828;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;white-space:nowrap;">ATRASADO</span>' : ''}
+      </div>
+      ${timeStr ? `<div class="calendar-event-time" style="${isLate ? 'color:#c62828;' : ''}">📅 ${timeStr}</div>` : ''}
       ${ev.location ? `<div class="calendar-event-location">📍 ${escHtml(ev.location)}</div>` : ''}
-      <div style="display:flex;gap:8px;margin-top:10px;">
-        <a href="${ev.htmlLink || 'https://calendar.google.com/calendar/r'}" target="_blank" style="flex:1;padding:8px;background:#f0f4ff;color:#1a5c9a;border:1px solid #c0d0f0;border-radius:8px;font-size:13px;font-weight:600;text-align:center;text-decoration:none;">📅 Ver agenda</a>
-        <button onclick="startFromCalendarEvent(${i})" style="flex:1;padding:8px;background:#1a5c9a;color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">📐 Fazer medição</button>
+      <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;">
+        <a href="${ev.htmlLink || 'https://calendar.google.com/calendar/r'}" target="_blank" style="flex:1;min-width:80px;padding:7px 4px;background:#fff3e0;color:#e87722;border:1px solid #fed7aa;border-radius:8px;font-size:12px;font-weight:600;text-align:center;text-decoration:none;">📅 Agenda</a>
+        ${mapsUrl ? `<a href="${mapsUrl}" target="_blank" style="flex:1;min-width:80px;padding:7px 4px;background:#e8f5e9;color:#2e7d32;border:1px solid #c8e6c9;border-radius:8px;font-size:12px;font-weight:600;text-align:center;text-decoration:none;">📍 Maps</a>` : ''}
+        <button onclick="startFromCalendarEvent(${realIdx})" style="flex:2;min-width:90px;padding:7px 4px;background:#e87722;color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;">📐 Medição</button>
       </div>
     </div>`;
   }).join('');
+}
+
+// Calendar view toggle
+function setCalendarView(view) {
+  calendarView = view;
+  document.getElementById('cal-btn-dia').classList.toggle('active', view === 'dia');
+  document.getElementById('cal-btn-semana').classList.toggle('active', view === 'semana');
+  const dayNav = document.getElementById('cal-day-nav');
+  if (dayNav) dayNav.style.display = view === 'dia' ? 'flex' : 'none';
+  if (view === 'dia' && !calendarSelectedDay) calendarSelectedDay = new Date();
+  renderCalendarEventsFiltered();
+}
+
+function changeDay(delta) {
+  if (!calendarSelectedDay) calendarSelectedDay = new Date();
+  calendarSelectedDay = new Date(calendarSelectedDay.getFullYear(), calendarSelectedDay.getMonth(), calendarSelectedDay.getDate() + delta);
+  renderCalendarEventsFiltered();
 }
 
 function checkSession() {
@@ -995,8 +1208,7 @@ function checkSession() {
   if (!raw) return false;
   try {
     const s = JSON.parse(raw);
-    // Rejeitar sessões antigas sem googleToken (sistema anterior de seleção de nome)
-    if (!s.googleToken) { localStorage.removeItem('vf_user'); return false; }
+    if (!s.name) { localStorage.removeItem('vf_user'); return false; }
     if (Date.now() > s.expiresAt) { localStorage.removeItem('vf_user'); return false; }
     currentUser = s.name;
     return true;
@@ -1051,7 +1263,7 @@ function showHome() {
 
 function renderHome() {
   const all = getMeasurements();
-  const pending = all.filter(m => m.status === 'draft' || m.status === 'pending');
+  const pending = all.filter(m => m.status === 'draft' || m.status === 'pending' || m.status === 'reaberta');
   const todayStart = new Date(); todayStart.setHours(0,0,0,0);
   const sent = all.filter(m => m.status === 'sent' && m.createdAt >= todayStart.getTime());
 
@@ -1078,9 +1290,10 @@ function renderHome() {
 }
 
 function renderMeasurementCard(m) {
-  const statusLabels = { draft: 'Rascunho', pending: 'Aguardando envio', sent: 'Enviada' };
-  const statusClass = { draft: 'status-draft', pending: 'status-pending', sent: 'status-sent' };
-  const canSend = m.status === 'pending' || m.status === 'draft';
+  const statusLabels = { draft: 'Rascunho', pending: 'Aguardando envio', sent: 'Enviada', reaberta: 'Reaberta' };
+  const statusClass = { draft: 'status-draft', pending: 'status-pending', sent: 'status-sent', reaberta: 'status-pending' };
+  const canSend = m.status === 'pending' || m.status === 'draft' || m.status === 'reaberta';
+  const sendLabel = m.status === 'reaberta' ? 'Reenviar (PUT)' : 'Enviar agora';
   const canEdit = m.status !== 'sent';
   const canReopen = m.status === 'sent';
   return `
@@ -1091,7 +1304,7 @@ function renderMeasurementCard(m) {
       </div>
       <div class="card-city">${escHtml(m.cidade || '')} · ${formatDate(m.createdAt)}</div>
       <div class="card-actions">
-        ${canSend ? `<button class="btn-sm btn-send" onclick="sendNow('${m.id}')">Enviar agora</button>` : ''}
+        ${canSend ? `<button class="btn-sm btn-send" onclick="sendNow('${m.id}')">${sendLabel}</button>` : ''}
         ${canEdit ? `<button class="btn-sm btn-edit" onclick="editMeasurement('${m.id}')">Editar</button>` : ''}
         ${canReopen ? `<button class="btn-sm" style="background:#fff3e0;color:#e65100;border:1px solid #ffcc80;border-radius:6px;padding:6px 12px;font-size:13px;cursor:pointer;" onclick="reabrirMedicao('${m.id}')">Reabrir</button>` : ''}
         <button class="btn-sm btn-delete" onclick="confirmDelete('${m.id}')">Excluir</button>
@@ -1100,13 +1313,13 @@ function renderMeasurementCard(m) {
 }
 
 function reabrirMedicao(id) {
-  if (!confirm('Reabrir esta medicao para edicao? Ela voltara ao status Rascunho.')) return;
+  if (!confirm('Reabrir esta medição para edição?\nAo reenviar, os dados existentes no servidor serão atualizados (PUT).')) return;
   const all = getMeasurements();
   const idx = all.findIndex(m => m.id === id);
   if (idx === -1) return;
-  all[idx].status = 'draft';
+  all[idx].status = 'reaberta';
   saveMeasurements(all);
-  showToast('Medicao reaberta para edicao', 'success');
+  showToast('Medição reaberta. Edite e envie novamente para atualizar.', 'success');
   renderHome();
 }
 
@@ -1180,11 +1393,19 @@ async function sendMeasurement(measurement, onAttempt) {
     createdAt: measurement.createdAt,
     cliente: measurement.cliente,
     endereco: measurement.endereco,
+    bairro: measurement.bairro || '',
     cidade: measurement.cidade,
     cep: measurement.cep,
     ac: measurement.ac,
     celular: measurement.celular,
     obs: measurement.obs,
+    garantia: measurement.garantia || '15',
+    avaliadoPor: measurement.avaliadoPor || '',
+    andaime: measurement.andaime || 'nao',
+    andaimeMetros: measurement.andaimeMetros || 0,
+    andaimeRodinhas: measurement.andaimeRodinhas || false,
+    andaimeBases: measurement.andaimeBases || false,
+    andaimeLargura: measurement.andaimeLargura || '1m',
     locais: locaisComprimidos
   };
 
@@ -1194,15 +1415,46 @@ async function sendMeasurement(measurement, onAttempt) {
 
   const body = JSON.stringify(payload);
   const PANEL_BASE = WEBHOOK_URL.replace('/api/medicao', '');
+  const isReopen = measurement.status === 'reaberta';
 
   if (onAttempt) onAttempt(1, 1);
 
-  // Dispara o POST sem esperar resposta (pode travar no iOS com SW antigo)
-  fetch(WEBHOOK_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body
-  }).catch(() => {});
+  // Reenvio de medição reaberta → PUT (aguarda resposta); envio normal → POST (fire-and-forget + ping)
+  if (isReopen) {
+    const _sess = (() => { try { return JSON.parse(localStorage.getItem('vf_user') || '{}'); } catch { return {}; } })();
+    const token = _sess.googleToken || null;
+    try {
+      const r = await fetch(`${PANEL_BASE}/api/medicoes/${measurement.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}) },
+        body
+      });
+      if (r.status === 401) {
+        showToast('Sessão expirada. Faça login novamente para reenviar a medição.', 'error');
+        return false;
+      }
+      if (r.status === 400) {
+        const d = await r.json().catch(() => ({}));
+        showToast(d.error || 'Esta medição já gerou orçamento e não pode ser alterada.', 'error');
+        return false;
+      }
+      if (!r.ok) {
+        showToast('Erro ao reenviar medição. Tente novamente.', 'error');
+        return false;
+      }
+      return true;
+    } catch (e) {
+      showToast('Sem conexão. Tente novamente quando online.', 'error');
+      return false;
+    }
+  } else {
+    // Dispara o POST sem esperar resposta (pode travar no iOS com SW antigo)
+    fetch(WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body
+    }).catch(() => {});
+  }
 
   // Verifica a cada 3s se o servidor recebeu (GET nunca trava)
   for (let i = 0; i < 20; i++) {
@@ -1264,17 +1516,19 @@ function makeEmptyMeasurement() {
     status: 'draft',
     user: currentUser,
     createdAt: Date.now(),
-    cliente: '', endereco: '', cidade: '', cep: '', ac: '', celular: '', obs: '',
+    cliente: '', endereco: '', bairro: '', cidade: '', cep: '', ac: '', celular: '', obs: '',
+    garantia: '15', avaliadoPor: '',
+    andaime: 'nao', andaimeMetros: 0, andaimeRodinhas: false, andaimeBases: false, andaimeLargura: '1m',
     locais: []
   };
 }
 
 // CHANGE 2 + 4c — empty strings instead of 0, fotos array added
 function makeEmptyLocal(nome = '') {
-  const loc = { nome, fotos: [] };
+  const loc = { nome, fotos: [], cortinaSegmentos: [{ largura: '', altura: '' }] };
   SERVICE_TYPES.forEach(st => {
     loc[st.key] = 0;
-    loc[st.key + 'Detalhe'] = [''];
+    if (st.key !== 'cortina') loc[st.key + 'Detalhe'] = [''];
   });
   return loc;
 }
@@ -1297,15 +1551,23 @@ function openForm(step) {
   // Reset step 1 fields
   document.getElementById('f-cliente').value = currentMeasurement.cliente || '';
   document.getElementById('f-endereco').value = currentMeasurement.endereco || '';
+  const bairroEl = document.getElementById('f-bairro');
+  if (bairroEl) bairroEl.value = currentMeasurement.bairro || '';
   document.getElementById('f-cidade').value = currentMeasurement.cidade || '';
   document.getElementById('f-cep').value = currentMeasurement.cep || '';
   // Trigger ViaCEP lookup if CEP was pre-filled (e.g. from calendar event)
-  if (currentMeasurement.cep) {
+  // mas só se bairro/endereco ainda estiverem vazios
+  if (currentMeasurement.cep && !currentMeasurement.endereco) {
     setTimeout(() => document.getElementById('f-cep').dispatchEvent(new Event('input')), 100);
   }
   document.getElementById('f-ac').value = currentMeasurement.ac || '';
   document.getElementById('f-celular').value = currentMeasurement.celular || '';
-  document.getElementById('f-obs').value = currentMeasurement.obs || '';
+  // Avaliado por (checkboxes)
+  const avaliadoChecks = document.querySelectorAll('input[name="avaliado"]');
+  const avaliadoArr = (currentMeasurement.avaliadoPor || '').split(',').map(s => s.trim()).filter(Boolean);
+  avaliadoChecks.forEach(cb => { cb.checked = avaliadoArr.includes(cb.value); });
+  // Garantia (radio no Step 1)
+  setRadioValue('f-garantia', currentMeasurement.garantia || '15');
 
   // Ensure at least one location
   if (!currentMeasurement.locais || currentMeasurement.locais.length === 0) {
@@ -1346,12 +1608,10 @@ function goToStep(n) {
     nb.className = 'btn-next'; nb.textContent = 'Próximo →'; nb.onclick = goNext;
     footer.appendChild(nb);
   } else {
-    const sd = document.createElement('button');
-    sd.className = 'btn-draft'; sd.textContent = 'Salvar Rascunho'; sd.onclick = saveDraft;
-    footer.appendChild(sd);
-    const sb = document.createElement('button');
-    sb.className = 'btn-submit'; sb.textContent = '✓ Enviar Medição'; sb.onclick = submitMeasurement;
-    footer.appendChild(sb);
+    // Step 3: apenas CONCLUIR (Voltar já adicionado pelo bloco n>1 acima)
+    const cb = document.createElement('button');
+    cb.className = 'btn-concluir'; cb.textContent = '✓ CONCLUIR'; cb.onclick = concluir;
+    footer.appendChild(cb);
   }
 
   if (n === 3) buildSummary();
@@ -1392,14 +1652,39 @@ function collectCurrentStep() {
   if (currentStep === 1) {
     currentMeasurement.cliente = document.getElementById('f-cliente').value.trim();
     currentMeasurement.endereco = document.getElementById('f-endereco').value.trim();
+    currentMeasurement.bairro = (document.getElementById('f-bairro') || {}).value?.trim() || '';
     currentMeasurement.cidade = document.getElementById('f-cidade').value.trim();
     currentMeasurement.cep = document.getElementById('f-cep').value.trim();
     currentMeasurement.ac = document.getElementById('f-ac').value.trim();
     currentMeasurement.celular = document.getElementById('f-celular').value.trim();
-    currentMeasurement.obs = document.getElementById('f-obs').value.trim();
+    // Avaliado por
+    const selectedAvaliados = Array.from(document.querySelectorAll('input[name="avaliado"]:checked')).map(cb => cb.value);
+    currentMeasurement.avaliadoPor = selectedAvaliados.join(', ');
+    const garantiaInput = document.querySelector('input[name="garantia"]:checked');
+    currentMeasurement.garantia = garantiaInput ? garantiaInput.value : '15';
   }
   if (currentStep === 2) {
     collectLocations();
+  }
+  if (currentStep === 3) {
+    // Collect obs
+    const obsEl = document.getElementById('f-obs');
+    if (obsEl) currentMeasurement.obs = obsEl.value.trim();
+    // Collect andaime
+    const andaimeInput = document.querySelector('input[name="andaime"]:checked');
+    currentMeasurement.andaime = andaimeInput ? andaimeInput.value : 'nao';
+    if (currentMeasurement.andaime === 'sim') {
+      currentMeasurement.andaimeMetros = parseFloat(document.getElementById('f-andaime-metros').value) || 0;
+      currentMeasurement.andaimeRodinhas = document.getElementById('f-andaime-rodinhas').checked;
+      currentMeasurement.andaimeBases = document.getElementById('f-andaime-bases').checked;
+      const larguraInput = document.querySelector('input[name="andaime-largura"]:checked');
+      currentMeasurement.andaimeLargura = larguraInput ? larguraInput.value : '1m';
+    } else {
+      currentMeasurement.andaimeMetros = 0;
+      currentMeasurement.andaimeRodinhas = false;
+      currentMeasurement.andaimeBases = false;
+      currentMeasurement.andaimeLargura = '1m';
+    }
   }
 }
 
@@ -1450,15 +1735,38 @@ function buildLocationCard(loc, idx) {
   });
   card.appendChild(grid);
 
-  // Photo section
+  // Photo section — direct event listener (não depende de bubbling)
   const photoSection = document.createElement('div');
   photoSection.className = 'location-photo-section';
-  photoSection.innerHTML = `
-    <div class="location-photo-header">📷 Fotos deste local</div>
-    <button class="btn-add-location-photo" type="button" onclick="triggerLocationPhoto(${idx})">+ Adicionar foto</button>
-    <input type="file" class="location-photo-file" accept="image/*" capture="environment" multiple style="display:none" data-loc="${idx}">
-    <div class="location-photos-grid" data-loc="${idx}"></div>
-  `;
+
+  const photoHeader = document.createElement('div');
+  photoHeader.className = 'location-photo-header';
+  photoHeader.textContent = '📷 Fotos deste local';
+  photoSection.appendChild(photoHeader);
+
+  const photoInput = document.createElement('input');
+  photoInput.type = 'file';
+  photoInput.className = 'location-photo-file';
+  photoInput.accept = 'image/*';
+  photoInput.capture = 'environment';
+  photoInput.multiple = true;
+  photoInput.style.display = 'none';
+  photoInput.dataset.loc = idx;
+  photoInput.addEventListener('change', handleLocationPhotoSelect);
+  photoSection.appendChild(photoInput);
+
+  const addPhotoBtn = document.createElement('button');
+  addPhotoBtn.type = 'button';
+  addPhotoBtn.className = 'btn-add-location-photo';
+  addPhotoBtn.textContent = '+ Adicionar foto';
+  addPhotoBtn.addEventListener('click', () => photoInput.click());
+  photoSection.appendChild(addPhotoBtn);
+
+  const photosGrid = document.createElement('div');
+  photosGrid.className = 'location-photos-grid';
+  photosGrid.dataset.loc = idx;
+  photoSection.appendChild(photosGrid);
+
   card.appendChild(photoSection);
 
   // Re-render existing photos for this location
@@ -1468,8 +1776,6 @@ function buildLocationCard(loc, idx) {
 }
 
 function buildFieldGroup(loc, locIdx, st) {
-  const detail = loc[st.key + 'Detalhe'] || [''];
-  const total = sum(detail);
   const wrap = document.createElement('div');
   wrap.className = 'field-group';
   wrap.dataset.type = st.key;
@@ -1480,6 +1786,41 @@ function buildFieldGroup(loc, locIdx, st) {
   label.textContent = st.label + ' (' + st.unit + ')';
   wrap.appendChild(label);
 
+  // Cortina: Largura × Altura rows (M1)
+  if (st.key === 'cortina') {
+    const segs = loc.cortinaSegmentos && loc.cortinaSegmentos.length > 0
+      ? loc.cortinaSegmentos
+      : [{ largura: '', altura: '' }];
+
+    const segContainer = document.createElement('div');
+    segContainer.className = 'inputs-container';
+    segContainer.dataset.cortina = locIdx;
+    wrap.appendChild(segContainer);
+
+    segs.forEach((seg, segIdx) => {
+      segContainer.appendChild(buildCortinRow(seg, locIdx, segIdx, segs.length));
+    });
+
+    const addBtn = document.createElement('button');
+    addBtn.type = 'button';
+    addBtn.className = 'btn-add-input';
+    addBtn.textContent = '+ Adicionar trecho';
+    addBtn.style.marginTop = '4px';
+    addBtn.addEventListener('click', () => addCortinRow(locIdx));
+    wrap.appendChild(addBtn);
+
+    const totalSpan = document.createElement('span');
+    totalSpan.className = 'field-total';
+    totalSpan.dataset.cortinaTot = locIdx;
+    const totArea = segs.reduce((a, s) => a + (parseFloat(s.largura) || 0) * (parseFloat(s.altura) || 0), 0);
+    totalSpan.textContent = `= ${totArea.toFixed(2).replace(/\.?0+$/, '')}m²`;
+    wrap.appendChild(totalSpan);
+    return wrap;
+  }
+
+  // Normal fields
+  const detail = loc[st.key + 'Detalhe'] || [''];
+  const total = sum(detail);
   const inputsContainer = document.createElement('div');
   inputsContainer.className = 'inputs-container';
   wrap.appendChild(inputsContainer);
@@ -1494,6 +1835,92 @@ function buildFieldGroup(loc, locIdx, st) {
   wrap.appendChild(totalSpan);
 
   return wrap;
+}
+
+function buildCortinRow(seg, locIdx, segIdx, total) {
+  const row = document.createElement('div');
+  row.className = 'input-row';
+  row.style.display = 'flex'; row.style.alignItems = 'center'; row.style.gap = '4px';
+
+  const lbl = document.createElement('span');
+  lbl.textContent = 'L:'; lbl.style.fontSize = '12px'; lbl.style.color = '#666';
+  const inpL = document.createElement('input');
+  inpL.type = 'number'; inpL.min = '0'; inpL.step = '0.01';
+  inpL.value = (seg.largura === '' || seg.largura === 0) ? '' : seg.largura;
+  inpL.placeholder = '0'; inpL.className = 'measure-input'; inpL.inputMode = 'decimal';
+  inpL.style.width = '70px';
+
+  const lbl2 = document.createElement('span');
+  lbl2.textContent = '× A:'; lbl2.style.fontSize = '12px'; lbl2.style.color = '#666';
+  const inpA = document.createElement('input');
+  inpA.type = 'number'; inpA.min = '0'; inpA.step = '0.01';
+  inpA.value = (seg.altura === '' || seg.altura === 0) ? '' : seg.altura;
+  inpA.placeholder = '0'; inpA.className = 'measure-input'; inpA.inputMode = 'decimal';
+  inpA.style.width = '70px';
+
+  const area = document.createElement('span');
+  area.style.fontSize = '12px'; area.style.color = '#e87722'; area.style.minWidth = '48px';
+  const recalcArea = () => {
+    const a = (parseFloat(inpL.value) || 0) * (parseFloat(inpA.value) || 0);
+    area.textContent = `=${a.toFixed(2).replace(/\.?0+$/, '')}m²`;
+    recalcCortinTotal(locIdx);
+  };
+  inpL.addEventListener('input', recalcArea);
+  inpA.addEventListener('input', recalcArea);
+  recalcArea();
+
+  const btnRem = document.createElement('button');
+  btnRem.className = 'btn-remove-input'; btnRem.title = 'Remover'; btnRem.textContent = '×';
+  btnRem.type = 'button'; btnRem.disabled = total <= 1;
+  btnRem.addEventListener('click', () => removeCortinRow(locIdx, segIdx));
+
+  row.appendChild(lbl); row.appendChild(inpL);
+  row.appendChild(lbl2); row.appendChild(inpA);
+  row.appendChild(area); row.appendChild(btnRem);
+  return row;
+}
+
+function getCortinSegs(locIdx) {
+  const container = document.querySelector(`[data-cortina="${locIdx}"]`);
+  if (!container) return [];
+  return Array.from(container.querySelectorAll('.input-row')).map(row => {
+    const inputs = row.querySelectorAll('.measure-input');
+    return { largura: parseFloat(inputs[0]?.value) || 0, altura: parseFloat(inputs[1]?.value) || 0 };
+  });
+}
+
+function recalcCortinTotal(locIdx) {
+  const segs = getCortinSegs(locIdx);
+  const tot = segs.reduce((a, s) => a + s.largura * s.altura, 0);
+  const totEl = document.querySelector(`[data-cortina-tot="${locIdx}"]`);
+  if (totEl) totEl.textContent = `= ${tot.toFixed(2).replace(/\.?0+$/, '')}m²`;
+}
+
+function addCortinRow(locIdx) {
+  collectLocations();
+  const loc = currentMeasurement.locais[locIdx];
+  if (!loc.cortinaSegmentos) loc.cortinaSegmentos = [{ largura: '', altura: '' }];
+  loc.cortinaSegmentos.push({ largura: '', altura: '' });
+  const fg = getFieldGroup(locIdx, 'cortina');
+  if (fg) {
+    const container = fg.querySelector(`[data-cortina="${locIdx}"]`);
+    if (container) {
+      const n = loc.cortinaSegmentos.length;
+      container.appendChild(buildCortinRow({ largura: '', altura: '' }, locIdx, n - 1, n));
+      container.querySelectorAll('.input-row').forEach((row, i) => {
+        const btnR = row.querySelector('.btn-remove-input');
+        if (btnR) btnR.disabled = n <= 1;
+      });
+    }
+  }
+}
+
+function removeCortinRow(locIdx, segIdx) {
+  collectLocations();
+  const loc = currentMeasurement.locais[locIdx];
+  if (!loc.cortinaSegmentos || loc.cortinaSegmentos.length <= 1) return;
+  loc.cortinaSegmentos.splice(segIdx, 1);
+  rebuildFieldGroup(locIdx, 'cortina');
 }
 
 // CHANGE 2 — empty display instead of 0
@@ -1577,6 +2004,22 @@ function rebuildFieldGroup(locIdx, stKey) {
   if (!fg) return;
   const loc = currentMeasurement.locais[locIdx];
   const st = SERVICE_TYPES.find(s => s.key === stKey);
+
+  if (stKey === 'cortina') {
+    const segs = loc.cortinaSegmentos && loc.cortinaSegmentos.length > 0
+      ? loc.cortinaSegmentos
+      : [{ largura: '', altura: '' }];
+    const ic = fg.querySelector(`[data-cortina="${locIdx}"]`);
+    if (ic) {
+      ic.innerHTML = '';
+      segs.forEach((seg, si) => ic.appendChild(buildCortinRow(seg, locIdx, si, segs.length)));
+    }
+    const totArea = segs.reduce((a, s) => a + (parseFloat(s.largura) || 0) * (parseFloat(s.altura) || 0), 0);
+    const totEl = fg.querySelector(`[data-cortina-tot="${locIdx}"]`);
+    if (totEl) totEl.textContent = `= ${totArea.toFixed(2).replace(/\.?0+$/, '')}m²`;
+    return;
+  }
+
   const detail = loc[stKey + 'Detalhe'] || [''];
   const total = sum(detail);
 
@@ -1620,10 +2063,17 @@ function collectLocations() {
     SERVICE_TYPES.forEach(st => {
       const fg = card.querySelector(`.field-group[data-type="${st.key}"]`);
       if (!fg) return;
-      const inputs = fg.querySelectorAll('.measure-input');
-      const detail = Array.from(inputs).map(inp => parseFloat(inp.value) || 0);
-      loc[st.key + 'Detalhe'] = detail;
-      loc[st.key] = sum(detail);
+      if (st.key === 'cortina') {
+        // Cortina: collect L×A segments
+        const segs = getCortinSegs(locIdx);
+        loc.cortinaSegmentos = segs;
+        loc.cortina = segs.reduce((a, s) => a + (s.largura || 0) * (s.altura || 0), 0);
+      } else {
+        const inputs = fg.querySelectorAll('.measure-input');
+        const detail = Array.from(inputs).map(inp => parseFloat(inp.value) || 0);
+        loc[st.key + 'Detalhe'] = detail;
+        loc[st.key] = sum(detail);
+      }
     });
     // Photos are already in loc.fotos — no need to re-collect
   });
@@ -1634,9 +2084,8 @@ function collectLocations() {
 // CHANGE 4f — Per-location photo functions
 // ══════════════════════════════════════════════
 function triggerLocationPhoto(locIdx) {
-  const card = document.querySelector(`.location-card[data-loc-idx="${locIdx}"]`);
-  if (!card) return;
-  const input = card.querySelector('.location-photo-file');
+  // Fallback: usado apenas se o botão antigo em cache chamar esta função
+  const input = document.querySelector(`.location-photo-file[data-loc="${locIdx}"]`);
   if (input) input.click();
 }
 
@@ -1719,6 +2168,24 @@ function buildSummary() {
   document.getElementById('sum-locais').textContent = currentMeasurement.locais.length + ' local(is)';
   const totalFotos = currentMeasurement.locais.reduce((a, l) => a + (l.fotos || []).length, 0);
   document.getElementById('sum-fotos').textContent = totalFotos + ' foto(s)';
+  document.getElementById('sum-avaliado-por').textContent = currentMeasurement.avaliadoPor || '—';
+  document.getElementById('sum-garantia').textContent = (currentMeasurement.garantia || '15') + ' anos';
+  // Populate obs textarea
+  const obsEl = document.getElementById('f-obs');
+  if (obsEl) obsEl.value = currentMeasurement.obs || '';
+  // Andaime — populate and show/hide extra fields
+  setRadioValue('f-andaime', currentMeasurement.andaime || 'nao');
+  const isAndaime = currentMeasurement.andaime === 'sim';
+  toggleAndaimeExtra(isAndaime);
+  if (isAndaime) {
+    const metrosEl = document.getElementById('f-andaime-metros');
+    if (metrosEl) metrosEl.value = currentMeasurement.andaimeMetros || '';
+    const rodinhasEl = document.getElementById('f-andaime-rodinhas');
+    if (rodinhasEl) rodinhasEl.checked = currentMeasurement.andaimeRodinhas || false;
+    const basesEl = document.getElementById('f-andaime-bases');
+    if (basesEl) basesEl.checked = currentMeasurement.andaimeBases || false;
+    setRadioValue('f-andaime-largura', currentMeasurement.andaimeLargura || '1m');
+  }
 
   const totalsDiv = document.getElementById('summary-totals');
   totalsDiv.innerHTML = SERVICE_TYPES.map(st => {
@@ -1746,6 +2213,17 @@ function saveDraft() {
   currentMeasurement.status = 'draft';
   upsertMeasurement(currentMeasurement);
   showToast('Rascunho salvo!', 'success');
+  showHome();
+}
+
+function concluir() {
+  collectLocations();
+  // Coleta obs do Step 3
+  const obsEl = document.getElementById('f-obs');
+  if (obsEl) currentMeasurement.obs = obsEl.value.trim();
+  currentMeasurement.status = 'draft';
+  upsertMeasurement(currentMeasurement);
+  showToast('Medição salva! Use "Enviar agora" para enviar.', 'success');
   showHome();
 }
 
@@ -1972,29 +2450,30 @@ window.addEventListener('DOMContentLoaded', () => {
     return fallbackName;
   }
 
-  // CHANGE 1 — CEP auto-fill
+  // CHANGE 1 — CEP auto-fill com bairro e validação
   document.getElementById('f-cep').addEventListener('input', async function() {
     const cep = this.value.replace(/\D/g, '');
     if (cep.length === 8) {
       try {
         const r = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
         const d = await r.json();
-        if (!d.erro) {
-          if (d.logradouro) document.getElementById('f-endereco').value = d.logradouro;
-          document.getElementById('f-cidade').value = (d.localidade || '') + (d.uf ? ' - ' + d.uf : '');
-          this.value = cep.replace(/(\d{5})(\d{3})/, '$1-$2');
-          showToast('CEP encontrado: ' + d.localidade + ' - ' + d.uf, 'success');
+        if (d.erro) {
+          showToast('CEP não encontrado. Verifique e tente novamente.', 'error');
+          return;
         }
-      } catch {}
+        if (d.logradouro) document.getElementById('f-endereco').value = d.logradouro;
+        const bairroEl = document.getElementById('f-bairro');
+        if (bairroEl && d.bairro) bairroEl.value = d.bairro;
+        document.getElementById('f-cidade').value = (d.localidade || '') + (d.uf ? ' - ' + d.uf : '');
+        this.value = cep.replace(/(\d{5})(\d{3})/, '$1-$2');
+        showToast('CEP encontrado: ' + d.localidade + ' - ' + d.uf, 'success');
+      } catch {
+        showToast('Erro ao consultar CEP. Verifique sua conexão.', 'error');
+      }
     }
   });
 
-  // CHANGE 4g — event delegation for location photo inputs
-  document.getElementById('locations-list').addEventListener('change', e => {
-    if (e.target.classList.contains('location-photo-file')) {
-      handleLocationPhotoSelect(e);
-    }
-  });
+  // Event listener de fotos agora é direto no input (dentro de buildLocationCard)
 });
 </script>
 </body>
