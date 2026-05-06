@@ -839,7 +839,10 @@
       </div>
       <div class="form-group">
         <label class="form-label">Cidade <span class="req">*</span></label>
-        <input class="form-input" id="f-cidade" type="text" placeholder="Cidade">
+        <div style="display:flex;gap:8px;">
+          <input class="form-input" id="f-cidade" type="text" placeholder="Cidade" style="flex:1;min-width:0">
+          <input class="form-input" id="f-uf" type="text" placeholder="UF" maxlength="2" style="width:60px;text-align:center;text-transform:uppercase" inputmode="text">
+        </div>
       </div>
       <div class="form-group">
         <label class="form-label">Responsável <span style="font-size:12px;color:var(--gray-500)">(síndico/zelador)</span></label>
@@ -1553,7 +1556,11 @@ function openForm(step) {
   document.getElementById('f-endereco').value = currentMeasurement.endereco || '';
   const bairroEl = document.getElementById('f-bairro');
   if (bairroEl) bairroEl.value = currentMeasurement.bairro || '';
-  document.getElementById('f-cidade').value = currentMeasurement.cidade || '';
+  // Split "Cidade - UF" back into separate fields
+  const cidadeParts = (currentMeasurement.cidade || '').split(' - ');
+  document.getElementById('f-cidade').value = cidadeParts[0] || '';
+  const ufEl2 = document.getElementById('f-uf');
+  if (ufEl2) ufEl2.value = cidadeParts[1] || '';
   document.getElementById('f-cep').value = currentMeasurement.cep || '';
   // Trigger ViaCEP lookup if CEP was pre-filled (e.g. from calendar event)
   // mas só se bairro/endereco ainda estiverem vazios
@@ -1653,7 +1660,9 @@ function collectCurrentStep() {
     currentMeasurement.cliente = document.getElementById('f-cliente').value.trim();
     currentMeasurement.endereco = document.getElementById('f-endereco').value.trim();
     currentMeasurement.bairro = (document.getElementById('f-bairro') || {}).value?.trim() || '';
-    currentMeasurement.cidade = document.getElementById('f-cidade').value.trim();
+    const cidadeVal = document.getElementById('f-cidade').value.trim();
+    const ufVal = (document.getElementById('f-uf') || {}).value?.trim().toUpperCase() || '';
+    currentMeasurement.cidade = cidadeVal + (ufVal ? ' - ' + ufVal : '');
     currentMeasurement.cep = document.getElementById('f-cep').value.trim();
     currentMeasurement.ac = document.getElementById('f-ac').value.trim();
     currentMeasurement.celular = document.getElementById('f-celular').value.trim();
@@ -1786,8 +1795,10 @@ function buildFieldGroup(loc, locIdx, st) {
   label.textContent = st.label + ' (' + st.unit + ')';
   wrap.appendChild(label);
 
-  // Cortina: Largura × Altura rows (M1)
+  // Cortina: Largura × Altura rows (M1) — span full width
   if (st.key === 'cortina') {
+    wrap.style.gridColumn = '1 / -1'; // span todas as colunas do grid
+
     const segs = loc.cortinaSegmentos && loc.cortinaSegmentos.length > 0
       ? loc.cortinaSegmentos
       : [{ largura: '', altura: '' }];
@@ -1840,29 +1851,46 @@ function buildFieldGroup(loc, locIdx, st) {
 function buildCortinRow(seg, locIdx, segIdx, total) {
   const row = document.createElement('div');
   row.className = 'input-row';
-  row.style.display = 'flex'; row.style.alignItems = 'center'; row.style.gap = '4px';
+  row.style.cssText = 'display:flex;align-items:center;gap:6px;width:100%';
 
+  // Largura
   const lbl = document.createElement('span');
-  lbl.textContent = 'L:'; lbl.style.fontSize = '12px'; lbl.style.color = '#666';
+  lbl.textContent = 'Larg.:';
+  lbl.style.cssText = 'font-size:12px;color:#666;flex-shrink:0;white-space:nowrap';
+
   const inpL = document.createElement('input');
   inpL.type = 'number'; inpL.min = '0'; inpL.step = '0.01';
   inpL.value = (seg.largura === '' || seg.largura === 0) ? '' : seg.largura;
-  inpL.placeholder = '0'; inpL.className = 'measure-input'; inpL.inputMode = 'decimal';
-  inpL.style.width = '70px';
+  inpL.placeholder = '0';
+  inpL.className = 'measure-input';
+  inpL.inputMode = 'decimal';
+  inpL.style.cssText = 'flex:1;min-width:0';
 
+  // Multiplicador
+  const mult = document.createElement('span');
+  mult.textContent = '×';
+  mult.style.cssText = 'font-size:14px;color:#999;flex-shrink:0;font-weight:600';
+
+  // Altura
   const lbl2 = document.createElement('span');
-  lbl2.textContent = '× A:'; lbl2.style.fontSize = '12px'; lbl2.style.color = '#666';
+  lbl2.textContent = 'Alt.:';
+  lbl2.style.cssText = 'font-size:12px;color:#666;flex-shrink:0;white-space:nowrap';
+
   const inpA = document.createElement('input');
   inpA.type = 'number'; inpA.min = '0'; inpA.step = '0.01';
   inpA.value = (seg.altura === '' || seg.altura === 0) ? '' : seg.altura;
-  inpA.placeholder = '0'; inpA.className = 'measure-input'; inpA.inputMode = 'decimal';
-  inpA.style.width = '70px';
+  inpA.placeholder = '0';
+  inpA.className = 'measure-input';
+  inpA.inputMode = 'decimal';
+  inpA.style.cssText = 'flex:1;min-width:0';
 
+  // Área calculada
   const area = document.createElement('span');
-  area.style.fontSize = '12px'; area.style.color = '#e87722'; area.style.minWidth = '48px';
+  area.style.cssText = 'font-size:12px;color:#e87722;flex-shrink:0;min-width:44px;text-align:right;font-weight:600';
+
   const recalcArea = () => {
     const a = (parseFloat(inpL.value) || 0) * (parseFloat(inpA.value) || 0);
-    area.textContent = `=${a.toFixed(2).replace(/\.?0+$/, '')}m²`;
+    area.textContent = `=${a > 0 ? a.toFixed(2).replace(/\.?0+$/, '') : '0'}m²`;
     recalcCortinTotal(locIdx);
   };
   inpL.addEventListener('input', recalcArea);
@@ -1875,6 +1903,7 @@ function buildCortinRow(seg, locIdx, segIdx, total) {
   btnRem.addEventListener('click', () => removeCortinRow(locIdx, segIdx));
 
   row.appendChild(lbl); row.appendChild(inpL);
+  row.appendChild(mult);
   row.appendChild(lbl2); row.appendChild(inpA);
   row.appendChild(area); row.appendChild(btnRem);
   return row;
@@ -2464,9 +2493,11 @@ window.addEventListener('DOMContentLoaded', () => {
         if (d.logradouro) document.getElementById('f-endereco').value = d.logradouro;
         const bairroEl = document.getElementById('f-bairro');
         if (bairroEl && d.bairro) bairroEl.value = d.bairro;
-        document.getElementById('f-cidade').value = (d.localidade || '') + (d.uf ? ' - ' + d.uf : '');
+        if (d.localidade) document.getElementById('f-cidade').value = d.localidade;
+        const ufEl = document.getElementById('f-uf');
+        if (ufEl && d.uf) ufEl.value = d.uf.toUpperCase();
         this.value = cep.replace(/(\d{5})(\d{3})/, '$1-$2');
-        showToast('CEP encontrado: ' + d.localidade + ' - ' + d.uf, 'success');
+        showToast('✅ CEP encontrado: ' + d.localidade + ' - ' + d.uf, 'success');
       } catch {
         showToast('Erro ao consultar CEP. Verifique sua conexão.', 'error');
       }

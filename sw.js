@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vedafacil-medidor-v18';
+const CACHE_NAME = 'vedafacil-medidor-v19';
 const CACHE_FILES = [
   './index.html',
   './sw.js',
