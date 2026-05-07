@@ -1168,22 +1168,41 @@ function renderCalendarEventsFiltered() {
   container.innerHTML = filtered.map((ev, i) => {
     const realIdx = events.indexOf(ev);
     const date = ev.start ? new Date(ev.start) : null;
-    const isLate = date && !isNaN(date) && date < now && ev.start.includes('T');
+    const isDone = isCalendarEventDone(ev.id);
+    const isLate = !isDone && date && !isNaN(date) && date < now && ev.start.includes('T');
     const timeStr = date && !isNaN(date)
       ? date.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit' }) + (ev.start.includes('T') ? ' ' + date.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' }) : '')
       : '';
     const mapsUrl = ev.location ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(ev.location)}` : null;
-    return `<div class="calendar-event-card" style="${isLate ? 'border-left-color:#c62828;' : ''}">
+
+    // Estilos do card: verde se concluído, vermelho se atrasado, padrão caso contrário
+    const cardStyle = isDone
+      ? 'border-left-color:#2e7d32;background:#f1f8e9;'
+      : isLate ? 'border-left-color:#c62828;' : '';
+    const titleStyle = isDone ? 'color:#2e7d32;' : isLate ? 'color:#c62828;' : '';
+    const timeStyle = isDone ? 'color:#388e3c;' : isLate ? 'color:#c62828;' : '';
+
+    const badge = isDone
+      ? '<span style="background:#2e7d32;color:#fff;border-radius:6px;padding:2px 10px;font-size:11px;font-weight:700;white-space:nowrap;">✅ CONCLUÍDO</span>'
+      : isLate
+        ? '<span style="background:#ffebee;color:#c62828;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;white-space:nowrap;">ATRASADO</span>'
+        : '';
+
+    const btnMedicao = isDone
+      ? `<button disabled style="flex:2;min-width:90px;padding:7px 4px;background:#a5d6a7;color:#1b5e20;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:default;opacity:0.7;">✅ Concluído</button>`
+      : `<button onclick="startFromCalendarEvent(${realIdx})" style="flex:2;min-width:90px;padding:7px 4px;background:#e87722;color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;">📐 Medição</button>`;
+
+    return `<div class="calendar-event-card" style="${cardStyle}">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
-        <div class="calendar-event-title" style="${isLate ? 'color:#c62828;' : ''}">${escHtml(ev.title || '(sem título)')}</div>
-        ${isLate ? '<span style="background:#ffebee;color:#c62828;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;white-space:nowrap;">ATRASADO</span>' : ''}
+        <div class="calendar-event-title" style="${titleStyle}">${escHtml(ev.title || '(sem título)')}</div>
+        ${badge}
       </div>
-      ${timeStr ? `<div class="calendar-event-time" style="${isLate ? 'color:#c62828;' : ''}">📅 ${timeStr}</div>` : ''}
+      ${timeStr ? `<div class="calendar-event-time" style="${timeStyle}">📅 ${timeStr}</div>` : ''}
       ${ev.location ? `<div class="calendar-event-location">📍 ${escHtml(ev.location)}</div>` : ''}
       <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;">
         <a href="${ev.htmlLink || 'https://calendar.google.com/calendar/r'}" target="_blank" style="flex:1;min-width:80px;padding:7px 4px;background:#fff3e0;color:#e87722;border:1px solid #fed7aa;border-radius:8px;font-size:12px;font-weight:600;text-align:center;text-decoration:none;">📅 Agenda</a>
         ${mapsUrl ? `<a href="${mapsUrl}" target="_blank" style="flex:1;min-width:80px;padding:7px 4px;background:#e8f5e9;color:#2e7d32;border:1px solid #c8e6c9;border-radius:8px;font-size:12px;font-weight:600;text-align:center;text-decoration:none;">📍 Maps</a>` : ''}
-        <button onclick="startFromCalendarEvent(${realIdx})" style="flex:2;min-width:90px;padding:7px 4px;background:#e87722;color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;">📐 Medição</button>
+        ${btnMedicao}
       </div>
     </div>`;
   }).join('');
@@ -1227,6 +1246,24 @@ function getMeasurements() {
 
 function saveMeasurements(arr) {
   localStorage.setItem('vf_measurements', JSON.stringify(arr));
+}
+
+// ── Eventos da agenda concluídos ──────────────────────────────────────────────
+function getCompletedCalendarEvents() {
+  try { return JSON.parse(localStorage.getItem('vf_completed_events') || '[]'); } catch { return []; }
+}
+function markCalendarEventDone(eventId) {
+  if (!eventId) return;
+  const done = getCompletedCalendarEvents();
+  if (!done.includes(eventId)) {
+    done.push(eventId);
+    localStorage.setItem('vf_completed_events', JSON.stringify(done));
+  }
+  renderCalendarEventsFiltered(); // atualiza a agenda imediatamente
+}
+function isCalendarEventDone(eventId) {
+  if (!eventId) return false;
+  return getCompletedCalendarEvents().includes(eventId);
 }
 
 function upsertMeasurement(m) {
@@ -1482,6 +1519,7 @@ async function sendNow(id) {
     if (ok) {
       m.status = 'sent';
       upsertMeasurement(m);
+      markCalendarEventDone(m.calendarEventId);
       showToast('Medição enviada com sucesso!', 'success');
     } else {
       showToast('Erro ao enviar. Tente novamente.', 'error');
@@ -1502,7 +1540,7 @@ async function syncPendingMeasurements() {
   for (const m of pending) {
     try {
       const ok = await sendMeasurement(m);
-      if (ok) { m.status = 'sent'; upsertMeasurement(m); }
+      if (ok) { m.status = 'sent'; upsertMeasurement(m); markCalendarEventDone(m.calendarEventId); }
     } catch {}
   }
   renderHome();
@@ -2271,6 +2309,7 @@ async function submitMeasurement() {
     if (ok) {
       currentMeasurement.status = 'sent';
       upsertMeasurement(currentMeasurement);
+      markCalendarEventDone(currentMeasurement.calendarEventId);
       showSuccessScreen(currentMeasurement);
     } else {
       currentMeasurement.status = 'pending';
@@ -2361,8 +2400,10 @@ async function loadCalendarEvents() {
 function startFromCalendarEvent(idx) {
   const ev = window._calendarEvents && window._calendarEvents[idx];
   if (!ev) { startNewMeasurement(); return; }
+  // Guarda o ID do evento para marcar como concluído após envio
 
   currentMeasurement = makeEmptyMeasurement();
+  if (ev.id) currentMeasurement.calendarEventId = ev.id;
   // ev.title from server (mapped from summary), ev.description for AC/phone
   currentMeasurement.cliente = ev.title || ev.summary || '';
   if (ev.location) {
