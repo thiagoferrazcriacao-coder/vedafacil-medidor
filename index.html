@@ -1795,7 +1795,7 @@ function buildFieldGroup(loc, locIdx, st) {
   label.textContent = st.label + ' (' + st.unit + ')';
   wrap.appendChild(label);
 
-  // Cortina: Largura × Altura rows (M1) — span full width
+  // Cortina: Largura × Altura rows — mesmo padrão dos outros campos
   if (st.key === 'cortina') {
     wrap.style.gridColumn = '1 / -1'; // span todas as colunas do grid
 
@@ -1811,14 +1811,6 @@ function buildFieldGroup(loc, locIdx, st) {
     segs.forEach((seg, segIdx) => {
       segContainer.appendChild(buildCortinRow(seg, locIdx, segIdx, segs.length));
     });
-
-    const addBtn = document.createElement('button');
-    addBtn.type = 'button';
-    addBtn.className = 'btn-add-input';
-    addBtn.textContent = '+ Adicionar trecho';
-    addBtn.style.marginTop = '4px';
-    addBtn.addEventListener('click', () => addCortinRow(locIdx));
-    wrap.appendChild(addBtn);
 
     const totalSpan = document.createElement('span');
     totalSpan.className = 'field-total';
@@ -1851,42 +1843,31 @@ function buildFieldGroup(loc, locIdx, st) {
 function buildCortinRow(seg, locIdx, segIdx, total) {
   const row = document.createElement('div');
   row.className = 'input-row';
-  row.style.cssText = 'display:flex;align-items:center;gap:6px;width:100%';
 
-  // Largura
-  const lbl = document.createElement('span');
-  lbl.textContent = 'Larg.:';
-  lbl.style.cssText = 'font-size:12px;color:#666;flex-shrink:0;white-space:nowrap';
-
+  // Input Largura
   const inpL = document.createElement('input');
   inpL.type = 'number'; inpL.min = '0'; inpL.step = '0.01';
   inpL.value = (seg.largura === '' || seg.largura === 0) ? '' : seg.largura;
-  inpL.placeholder = '0';
+  inpL.placeholder = 'Larg.';
   inpL.className = 'measure-input';
   inpL.inputMode = 'decimal';
-  inpL.style.cssText = 'flex:1;min-width:0';
 
-  // Multiplicador
+  // Separador ×
   const mult = document.createElement('span');
   mult.textContent = '×';
-  mult.style.cssText = 'font-size:14px;color:#999;flex-shrink:0;font-weight:600';
+  mult.style.cssText = 'font-size:13px;color:#aaa;flex-shrink:0;padding:0 2px';
 
-  // Altura
-  const lbl2 = document.createElement('span');
-  lbl2.textContent = 'Alt.:';
-  lbl2.style.cssText = 'font-size:12px;color:#666;flex-shrink:0;white-space:nowrap';
-
+  // Input Altura
   const inpA = document.createElement('input');
   inpA.type = 'number'; inpA.min = '0'; inpA.step = '0.01';
   inpA.value = (seg.altura === '' || seg.altura === 0) ? '' : seg.altura;
-  inpA.placeholder = '0';
+  inpA.placeholder = 'Alt.';
   inpA.className = 'measure-input';
   inpA.inputMode = 'decimal';
-  inpA.style.cssText = 'flex:1;min-width:0';
 
-  // Área calculada
+  // Área calculada (compacta, mesmo estilo do field-total mas inline)
   const area = document.createElement('span');
-  area.style.cssText = 'font-size:12px;color:#e87722;flex-shrink:0;min-width:44px;text-align:right;font-weight:600';
+  area.style.cssText = 'font-size:11px;color:var(--primary);flex-shrink:0;white-space:nowrap;font-weight:700';
 
   const recalcArea = () => {
     const a = (parseFloat(inpL.value) || 0) * (parseFloat(inpA.value) || 0);
@@ -1897,15 +1878,24 @@ function buildCortinRow(seg, locIdx, segIdx, total) {
   inpA.addEventListener('input', recalcArea);
   recalcArea();
 
+  // Botão + (adicionar trecho) — igual ao padrão dos outros campos
+  const btnAdd = document.createElement('button');
+  btnAdd.type = 'button'; btnAdd.className = 'btn-add-input'; btnAdd.textContent = '+';
+  btnAdd.title = 'Adicionar trecho';
+  btnAdd.addEventListener('click', () => addCortinRow(locIdx));
+
+  // Botão × (remover)
   const btnRem = document.createElement('button');
-  btnRem.className = 'btn-remove-input'; btnRem.title = 'Remover'; btnRem.textContent = '×';
-  btnRem.type = 'button'; btnRem.disabled = total <= 1;
+  btnRem.type = 'button'; btnRem.className = 'btn-remove-input'; btnRem.textContent = '×';
+  btnRem.title = 'Remover trecho'; btnRem.disabled = total <= 1;
   btnRem.addEventListener('click', () => removeCortinRow(locIdx, segIdx));
 
-  row.appendChild(lbl); row.appendChild(inpL);
+  row.appendChild(inpL);
   row.appendChild(mult);
-  row.appendChild(lbl2); row.appendChild(inpA);
-  row.appendChild(area); row.appendChild(btnRem);
+  row.appendChild(inpA);
+  row.appendChild(area);
+  row.appendChild(btnAdd);
+  row.appendChild(btnRem);
   return row;
 }
 
