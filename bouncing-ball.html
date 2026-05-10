@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Bolinha quicando</title>
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0f1115;
+      font-family: system-ui, sans-serif;
+      color: #eee;
+      flex-direction: column;
+      gap: 16px;
+    }
+    h1 {
+      font-size: 14px;
+      font-weight: 500;
+      opacity: 0.7;
+      margin: 0;
+    }
+    canvas {
+      background: #1a1d24;
+      border: 2px solid #3a3f4b;
+      border-radius: 8px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    }
+  </style>
+</head>
+<body>
+  <h1>Bolinha quicando infinitamente</h1>
+  <canvas id="box" width="500" height="400"></canvas>
+
+  <script>
+    const canvas = document.getElementById('box');
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width;
+    const H = canvas.height;
+
+    const ball = {
+      x: W / 2,
+      y: H / 2,
+      r: 18,
+      vx: 4,
+      vy: 3,
+      hue: 200
+    };
+
+    function frame() {
+      ctx.fillStyle = '#1a1d24';
+      ctx.fillRect(0, 0, W, H);
+
+      ball.x += ball.vx;
+      ball.y += ball.vy;
+
+      if (ball.x - ball.r <= 0) {
+        ball.x = ball.r;
+        ball.vx = -ball.vx;
+        ball.hue = (ball.hue + 40) % 360;
+      } else if (ball.x + ball.r >= W) {
+        ball.x = W - ball.r;
+        ball.vx = -ball.vx;
+        ball.hue = (ball.hue + 40) % 360;
+      }
+      if (ball.y - ball.r <= 0) {
+        ball.y = ball.r;
+        ball.vy = -ball.vy;
+        ball.hue = (ball.hue + 40) % 360;
+      } else if (ball.y + ball.r >= H) {
+        ball.y = H - ball.r;
+        ball.vy = -ball.vy;
+        ball.hue = (ball.hue + 40) % 360;
+      }
+
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+      ctx.fillStyle = `hsl(${ball.hue}, 80%, 60%)`;
+      ctx.shadowColor = `hsl(${ball.hue}, 80%, 60%)`;
+      ctx.shadowBlur = 20;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      requestAnimationFrame(frame);
+    }
+
+    frame();
+  </script>
+</body>
+</html>
