@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Mingau - O Gatinho Virtual</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-1: #ffd6e8;
+      --bg-2: #c9e7ff;
+      --bg-3: #fff7c2;
+      --panel: #fffaf3;
+      --ink: #2b2b3d;
+      --muted: #7a7a8c;
+      --primary: #ff7aa2;
+      --primary-dark: #d94a7c;
+      --good: #4caf50;
+      --warn: #ffb300;
+      --bad: #e53935;
+      --info: #29b6f6;
+      --shadow: 0 6px 18px rgba(0,0,0,0.12);
+    }
+
+    html, body {
+      height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Comic Sans MS', sans-serif;
+      color: var(--ink);
+      background: linear-gradient(135deg, var(--bg-1), var(--bg-2) 50%, var(--bg-3));
+      overflow-x: hidden;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+
+    .game {
+      width: 100%;
+      max-width: 460px;
+      background: var(--panel);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .name-box {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #fff;
+      border: 2px dashed var(--primary);
+      border-radius: 14px;
+      padding: 6px 10px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .name-box input {
+      border: none;
+      outline: none;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--primary-dark);
+      background: transparent;
+      width: 100%;
+      min-width: 0;
+      font-family: inherit;
+    }
+
+    .score-box {
+      background: linear-gradient(135deg, #ffd54f, #ffb300);
+      color: #5b3a00;
+      font-weight: 800;
+      padding: 8px 12px;
+      border-radius: 14px;
+      font-size: 16px;
+      white-space: nowrap;
+      box-shadow: 0 3px 0 #c98a00;
+    }
+
+    .stage {
+      background: linear-gradient(180deg, #e3f2fd 0%, #fff 60%, #fce4ec 100%);
+      border-radius: 18px;
+      padding: 8px;
+      height: 240px;
+      position: relative;
+      overflow: hidden;
+      border: 3px solid #fff;
+      box-shadow: inset 0 -10px 20px rgba(0,0,0,0.04);
+    }
+
+    .floor {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 40px;
+      background: linear-gradient(180deg, #d7c4a3, #b89b73);
+      border-top: 3px solid #a07d54;
+    }
+
+    .speech {
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #fff;
+      padding: 6px 12px;
+      border-radius: 16px;
+      border: 2px solid var(--ink);
+      font-weight: 700;
+      font-size: 14px;
+      opacity: 0;
+      transition: opacity 0.3s, transform 0.3s;
+      pointer-events: none;
+      white-space: nowrap;
+      z-index: 5;
+    }
+    .speech.show { opacity: 1; transform: translateX(-50%) translateY(-4px); }
+    .speech::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0; height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 8px solid var(--ink);
+    }
+
+    /* ===== Cat ===== */
+    .cat-wrap {
+      position: absolute;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 160px;
+      height: 170px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .cat-wrap.bouncing { animation: bounce 0.5s ease; }
+    .cat-wrap.sleeping { animation: breathe 3s ease-in-out infinite; }
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(-12px); }
+    }
+    @keyframes breathe {
+      0%, 100% { transform: translateX(-50%) scale(1); }
+      50% { transform: translateX(-50%) scale(1.03); }
+    }
+
+    .cat {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .body {
+      position: absolute;
+      bottom: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 120px; height: 90px;
+      background: var(--fur, #ffb74d);
+      border-radius: 50% 50% 40% 40% / 60% 60% 40% 40%;
+      box-shadow: inset -10px -10px 0 rgba(0,0,0,0.06);
+    }
+    .tail {
+      position: absolute;
+      bottom: 20px; right: 0px;
+      width: 50px; height: 18px;
+      background: var(--fur, #ffb74d);
+      border-radius: 50%;
+      transform-origin: left center;
+      animation: tailwag 1.5s ease-in-out infinite;
+      box-shadow: inset 0 -4px 0 rgba(0,0,0,0.06);
+    }
+    @keyframes tailwag {
+      0%, 100% { transform: rotate(-10deg); }
+      50% { transform: rotate(20deg); }
+    }
+    .head {
+      position: absolute;
+      bottom: 70px; left: 50%;
+      transform: translateX(-50%);
+      width: 110px; height: 95px;
+      background: var(--fur, #ffb74d);
+      border-radius: 50% 50% 45% 45% / 55% 55% 45% 45%;
+      box-shadow: inset -8px -8px 0 rgba(0,0,0,0.06);
+    }
+    .ear {
+      position: absolute;
+      top: -10px;
+      width: 0; height: 0;
+      border-left: 20px solid transparent;
+      border-right: 20px solid transparent;
+      border-bottom: 30px solid var(--fur, #ffb74d);
+    }
+    .ear.left { left: 8px; transform: rotate(-20deg); }
+    .ear.right { right: 8px; transform: rotate(20deg); }
+    .ear-inner {
+      position: absolute;
+      top: -22px;
+      width: 0; height: 0;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-bottom: 18px solid #f48fb1;
+    }
+    .ear.left .ear-inner { left: -10px; }
+    .ear.right .ear-inner { right: -10px; }
+
+    .eye {
+      position: absolute;
+      top: 32px;
+      width: 18px; height: 22px;
+      background: #fff;
+      border-radius: 50%;
+      overflow: hidden;
+    }
+    .eye.left { left: 22px; }
+    .eye.right { right: 22px; }
+    .pupil {
+      position: absolute;
+      top: 4px; left: 50%;
+      transform: translateX(-50%);
+      width: 8px; height: 14px;
+      background: #1a1a1a;
+      border-radius: 50%;
+    }
+    .pupil::after {
+      content: '';
+      position: absolute;
+      top: 2px; right: 1px;
+      width: 3px; height: 3px;
+      background: #fff;
+      border-radius: 50%;
+    }
+
+    /* Eye states */
+    .eye.closed {
+      height: 3px;
+      background: #1a1a1a;
+      border-radius: 0;
+      top: 42px;
+    }
+    .eye.closed .pupil { display: none; }
+    .eye.sad .pupil { top: 8px; }
+    .eye.heart {
+      background: transparent;
+    }
+    .eye.heart .pupil {
+      background: transparent;
+      width: 18px;
+      height: 18px;
+      top: 2px;
+    }
+    .eye.heart .pupil::before {
+      content: '♥';
+      position: absolute;
+      top: -6px; left: -3px;
+      font-size: 20px;
+      color: #e91e63;
+    }
+    .eye.heart .pupil::after { display: none; }
+
+    .nose {
+      position: absolute;
+      top: 55px; left: 50%;
+      transform: translateX(-50%);
+      width: 0; height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 6px solid #c2185b;
+    }
+    .mouth {
+      position: absolute;
+      top: 64px; left: 50%;
+      transform: translateX(-50%);
+      width: 30px; height: 12px;
+    }
+    .mouth::before, .mouth::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      width: 12px; height: 8px;
+      border: 2px solid #1a1a1a;
+      border-top: none;
+      border-right: none;
+      border-radius: 0 0 0 12px;
+    }
+    .mouth::before { left: 0; }
+    .mouth::after { right: 0; transform: scaleX(-1); }
+
+    .whiskers {
+      position: absolute;
+      top: 56px;
+      width: 30px;
+      height: 1px;
+    }
+    .whiskers::before, .whiskers::after {
+      content: '';
+      position: absolute;
+      width: 25px;
+      height: 1px;
+      background: #1a1a1a;
+    }
+    .whiskers::before { top: -4px; }
+    .whiskers::after { top: 4px; }
+    .whiskers.left { left: -10px; }
+    .whiskers.right { right: -10px; }
+    .whiskers.right::before, .whiskers.right::after { right: 0; }
+
+    /* Dirty overlay */
+    .cat-wrap.dirty .head::before,
+    .cat-wrap.dirty .body::before {
+      content: '';
+      position: absolute;
+      background: rgba(120, 80, 40, 0.4);
+      border-radius: 50%;
+    }
+    .cat-wrap.dirty .head::before {
+      top: 20px; left: 70px;
+      width: 18px; height: 12px;
+    }
+    .cat-wrap.dirty .body::before {
+      top: 30px; left: 20px;
+      width: 22px; height: 16px;
+    }
+
+    /* Zzz when sleeping */
+    .zzz {
+      position: absolute;
+      top: -10px; right: -10px;
+      font-size: 22px;
+      font-weight: bold;
+      color: #5c6bc0;
+      opacity: 0;
+      animation: zfloat 2s ease-in-out infinite;
+    }
+    .cat-wrap.sleeping .zzz { opacity: 1; }
+    @keyframes zfloat {
+      0% { transform: translateY(0); opacity: 0; }
+      50% { opacity: 1; }
+      100% { transform: translateY(-20px); opacity: 0; }
+    }
+
+    /* Yarn ball */
+    .yarn {
+      position: absolute;
+      bottom: 30px;
+      width: 36px;
+      height: 36px;
+      background: radial-gradient(circle at 30% 30%, #ffccbc, #ff8a65);
+      border-radius: 50%;
+      box-shadow: inset -4px -4px 0 rgba(0,0,0,0.1);
+      display: none;
+      z-index: 2;
+    }
+    .yarn::before, .yarn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.5);
+    }
+    .yarn::before { transform: rotate(30deg); border-style: dashed; }
+    .yarn::after { transform: rotate(-30deg); border-style: dashed; }
+    .yarn.show { display: block; animation: roll 1s linear infinite; }
+    @keyframes roll {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* Food bowl */
+    .bowl {
+      position: absolute;
+      bottom: 30px;
+      width: 50px;
+      height: 22px;
+      background: linear-gradient(180deg, #90caf9, #1976d2);
+      border-radius: 0 0 50% 50% / 0 0 100% 100%;
+      display: none;
+      z-index: 2;
+    }
+    .bowl::before {
+      content: '';
+      position: absolute;
+      top: -6px; left: 4px; right: 4px;
+      height: 8px;
+      background: var(--bowl-content, #ffab40);
+      border-radius: 50%;
+    }
+    .bowl.show { display: block; }
+
+    /* Hearts/particles */
+    .particle {
+      position: absolute;
+      font-size: 22px;
+      pointer-events: none;
+      animation: float-up 1.5s ease-out forwards;
+      z-index: 10;
+    }
+    @keyframes float-up {
+      0% { transform: translateY(0) scale(0.5); opacity: 0; }
+      20% { opacity: 1; }
+      100% { transform: translateY(-80px) scale(1.4); opacity: 0; }
+    }
+
+    /* Bath bubbles */
+    .bubble {
+      position: absolute;
+      background: radial-gradient(circle at 30% 30%, #fff, rgba(173,216,230,0.6));
+      border-radius: 50%;
+      pointer-events: none;
+      animation: bubble-up 2s ease-out forwards;
+      z-index: 4;
+    }
+    @keyframes bubble-up {
+      0% { transform: translateY(0) scale(0.3); opacity: 0; }
+      30% { opacity: 0.9; }
+      100% { transform: translateY(-100px) scale(1.2); opacity: 0; }
+    }
+
+    /* ===== Stats ===== */
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .stat {
+      background: #fff;
+      border-radius: 12px;
+      padding: 8px 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .stat-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .stat-head .label { display: flex; align-items: center; gap: 4px; }
+    .stat-head .val { color: var(--ink); }
+    .bar {
+      height: 8px;
+      background: #eee;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.4s ease, background-color 0.4s ease;
+    }
+
+    /* ===== Action buttons ===== */
+    .actions {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .action {
+      background: #fff;
+      border: 3px solid transparent;
+      border-radius: 14px;
+      padding: 10px 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: transform 0.1s, border-color 0.2s, background-color 0.2s;
+      box-shadow: 0 3px 0 rgba(0,0,0,0.08);
+      color: var(--ink);
+    }
+    .action:hover { border-color: var(--primary); }
+    .action:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,0.08); }
+    .action:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .action .icon { font-size: 28px; line-height: 1; }
+    .action .name { font-size: 12px; font-weight: 700; }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .reset-btn {
+      background: transparent;
+      border: 1px solid var(--muted);
+      color: var(--muted);
+      padding: 4px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 11px;
+    }
+    .reset-btn:hover { background: var(--bad); border-color: var(--bad); color: #fff; }
+
+    .mood-tag {
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      background: var(--good);
+      color: #fff;
+    }
+    .mood-tag.warn { background: var(--warn); }
+    .mood-tag.bad { background: var(--bad); }
+    .mood-tag.sleep { background: #5c6bc0; }
+
+    @media (max-width: 360px) {
+      .stage { height: 220px; }
+      .cat-wrap { width: 140px; height: 150px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="game">
+    <header>
+      <div class="name-box" title="Clique para renomear">
+        <span>😺</span>
+        <input id="catName" type="text" maxlength="14" value="Mingau">
+      </div>
+      <div class="score-box">⭐ <span id="score">0</span></div>
+    </header>
+
+    <div class="stage" id="stage">
+      <div class="floor"></div>
+      <div class="speech" id="speech">Oi! :3</div>
+
+      <div class="yarn" id="yarn"></div>
+      <div class="bowl" id="bowl"></div>
+
+      <div class="cat-wrap" id="catWrap">
+        <div class="zzz">Z z z</div>
+        <div class="cat">
+          <div class="tail" id="tail"></div>
+          <div class="body" id="body"></div>
+          <div class="head" id="head">
+            <div class="ear left"><div class="ear-inner"></div></div>
+            <div class="ear right"><div class="ear-inner"></div></div>
+            <div class="eye left" id="eyeL"><div class="pupil"></div></div>
+            <div class="eye right" id="eyeR"><div class="pupil"></div></div>
+            <div class="whiskers left"></div>
+            <div class="whiskers right"></div>
+            <div class="nose"></div>
+            <div class="mouth"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-head"><span class="label">🍗 Fome</span><span class="val"><span id="hungerVal">100</span>%</span></div>
+        <div class="bar"><div class="bar-fill" id="hungerBar"></div></div>
+      </div>
+      <div class="stat">
+        <div class="stat-head"><span class="label">💧 Sede</span><span class="val"><span id="thirstVal">100</span>%</span></div>
+        <div class="bar"><div class="bar-fill" id="thirstBar"></div></div>
+      </div>
+      <div class="stat">
+        <div class="stat-head"><span class="label">🧼 Limpeza</span><span class="val"><span id="cleanVal">100</span>%</span></div>
+        <div class="bar"><div class="bar-fill" id="cleanBar"></div></div>
+      </div>
+      <div class="stat">
+        <div class="stat-head"><span class="label">😻 Alegria</span><span class="val"><span id="funVal">100</span>%</span></div>
+        <div class="bar"><div class="bar-fill" id="funBar"></div></div>
+      </div>
+      <div class="stat">
+        <div class="stat-head"><span class="label">⚡ Energia</span><span class="val"><span id="energyVal">100</span>%</span></div>
+        <div class="bar"><div class="bar-fill" id="energyBar"></div></div>
+      </div>
+      <div class="stat">
+        <div class="stat-head"><span class="label">💖 Humor</span><span class="val" id="moodTag"><span class="mood-tag" id="moodLabel">Feliz</span></span></div>
+        <div class="bar"><div class="bar-fill" id="moodBar"></div></div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="action" data-action="feed">
+        <div class="icon">🍗</div>
+        <div class="name">Comida</div>
+      </button>
+      <button class="action" data-action="water">
+        <div class="icon">💧</div>
+        <div class="name">Água</div>
+      </button>
+      <button class="action" data-action="brush">
+        <div class="icon">🪮</div>
+        <div class="name">Pentear</div>
+      </button>
+      <button class="action" data-action="bath">
+        <div class="icon">🛁</div>
+        <div class="name">Banho</div>
+      </button>
+      <button class="action" data-action="play">
+        <div class="icon">🧶</div>
+        <div class="name">Brincar</div>
+      </button>
+      <button class="action" data-action="sleep">
+        <div class="icon">💤</div>
+        <div class="name">Dormir</div>
+      </button>
+    </div>
+
+    <div class="footer">
+      <span>O bichano também precisa de cuidado ao longo do tempo 💝</span>
+      <button class="reset-btn" id="resetBtn">Reiniciar</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    const SAVE_KEY = 'mingau_save_v1';
+    const TICK_MS = 1000;
+
+    const DECAY = {
+      hunger: 0.6,
+      thirst: 0.8,
+      clean: 0.25,
+      fun: 0.4,
+      energy: 0.35,
+    };
+
+    const defaultState = () => ({
+      name: 'Mingau',
+      hunger: 90,
+      thirst: 90,
+      clean: 100,
+      fun: 85,
+      energy: 80,
+      score: 0,
+      sleeping: false,
+      lastTick: Date.now(),
+    });
+
+    let state = load();
+
+    function load() {
+      try {
+        const raw = localStorage.getItem(SAVE_KEY);
+        if (!raw) return defaultState();
+        const s = Object.assign(defaultState(), JSON.parse(raw));
+        const elapsed = (Date.now() - (s.lastTick || Date.now())) / 1000;
+        if (elapsed > 0) applyDecay(s, Math.min(elapsed, 3600));
+        s.lastTick = Date.now();
+        return s;
+      } catch (e) {
+        return defaultState();
+      }
+    }
+
+    function save() {
+      state.lastTick = Date.now();
+      localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+    }
+
+    function clamp(v) { return Math.max(0, Math.min(100, v)); }
+
+    function applyDecay(s, seconds) {
+      const factor = seconds;
+      if (s.sleeping) {
+        s.energy = clamp(s.energy + factor * 1.2);
+        s.hunger = clamp(s.hunger - DECAY.hunger * factor * 0.3);
+        s.thirst = clamp(s.thirst - DECAY.thirst * factor * 0.3);
+        if (s.energy >= 100) s.sleeping = false;
+      } else {
+        s.hunger = clamp(s.hunger - DECAY.hunger * factor);
+        s.thirst = clamp(s.thirst - DECAY.thirst * factor);
+        s.clean = clamp(s.clean - DECAY.clean * factor);
+        s.fun = clamp(s.fun - DECAY.fun * factor);
+        s.energy = clamp(s.energy - DECAY.energy * factor);
+      }
+      const avg = (s.hunger + s.thirst + s.clean + s.fun + s.energy) / 5;
+      if (avg > 70) s.score += Math.round(factor * 0.5);
+      else if (avg < 25) s.score = Math.max(0, s.score - Math.round(factor));
+    }
+
+    // ===== UI elements =====
+    const el = {
+      score: document.getElementById('score'),
+      catName: document.getElementById('catName'),
+      stage: document.getElementById('stage'),
+      catWrap: document.getElementById('catWrap'),
+      eyeL: document.getElementById('eyeL'),
+      eyeR: document.getElementById('eyeR'),
+      speech: document.getElementById('speech'),
+      yarn: document.getElementById('yarn'),
+      bowl: document.getElementById('bowl'),
+      moodLabel: document.getElementById('moodLabel'),
+      moodBar: document.getElementById('moodBar'),
+      resetBtn: document.getElementById('resetBtn'),
+    };
+
+    const stats = ['hunger', 'thirst', 'clean', 'fun', 'energy'];
+    stats.forEach(k => {
+      el[k + 'Val'] = document.getElementById(k + 'Val');
+      el[k + 'Bar'] = document.getElementById(k + 'Bar');
+    });
+
+    function statColor(v) {
+      if (v > 60) return '#4caf50';
+      if (v > 30) return '#ffb300';
+      return '#e53935';
+    }
+
+    function moodOf() {
+      if (state.sleeping) return { label: 'Dormindo', cls: 'sleep' };
+      const min = Math.min(state.hunger, state.thirst, state.clean, state.fun, state.energy);
+      const avg = (state.hunger + state.thirst + state.clean + state.fun + state.energy) / 5;
+      if (avg > 75 && min > 50) return { label: 'Muito feliz', cls: '' };
+      if (avg > 55) return { label: 'Feliz', cls: '' };
+      if (avg > 35) return { label: 'Resmungando', cls: 'warn' };
+      return { label: 'Tristinho', cls: 'bad' };
+    }
+
+    function fur() {
+      if (state.clean < 35) return '#a98b66';
+      return '#ffb74d';
+    }
+
+    function render() {
+      el.score.textContent = state.score;
+      stats.forEach(k => {
+        const v = Math.round(state[k]);
+        el[k + 'Val'].textContent = v;
+        el[k + 'Bar'].style.width = v + '%';
+        el[k + 'Bar'].style.background = statColor(v);
+      });
+      const m = moodOf();
+      el.moodLabel.textContent = m.label;
+      el.moodLabel.className = 'mood-tag ' + m.cls;
+      const avg = Math.round((state.hunger + state.thirst + state.clean + state.fun + state.energy) / 5);
+      el.moodBar.style.width = avg + '%';
+      el.moodBar.style.background = statColor(avg);
+
+      el.catWrap.style.setProperty('--fur', fur());
+      el.catWrap.classList.toggle('sleeping', state.sleeping);
+      el.catWrap.classList.toggle('dirty', state.clean < 45);
+
+      // Eye state
+      ['eyeL', 'eyeR'].forEach(id => {
+        const e = el[id];
+        e.className = e.className.replace(/\b(closed|sad|heart)\b/g, '').trim() + ' ' + (id === 'eyeL' ? 'left' : 'right');
+        if (state.sleeping) e.classList.add('closed');
+        else if (state.fun > 75 && state.hunger > 50 && state.clean > 50) e.classList.add('heart');
+        else if (state.fun < 30 || state.hunger < 25) e.classList.add('sad');
+      });
+
+      if (state.name && state.name !== el.catName.value) {
+        el.catName.value = state.name;
+      }
+    }
+
+    function speak(text, ms = 1500) {
+      el.speech.textContent = text;
+      el.speech.classList.add('show');
+      clearTimeout(speak._t);
+      speak._t = setTimeout(() => el.speech.classList.remove('show'), ms);
+    }
+
+    function particles(emoji, n = 6) {
+      const rect = el.catWrap.getBoundingClientRect();
+      const stageRect = el.stage.getBoundingClientRect();
+      const cx = rect.left - stageRect.left + rect.width / 2;
+      const cy = rect.top - stageRect.top + 20;
+      for (let i = 0; i < n; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.textContent = emoji;
+        p.style.left = (cx - 10 + (Math.random() - 0.5) * 60) + 'px';
+        p.style.top = (cy + (Math.random() - 0.5) * 30) + 'px';
+        p.style.animationDelay = (i * 80) + 'ms';
+        el.stage.appendChild(p);
+        setTimeout(() => p.remove(), 1600 + i * 80);
+      }
+    }
+
+    function bubbles(n = 12) {
+      const rect = el.catWrap.getBoundingClientRect();
+      const stageRect = el.stage.getBoundingClientRect();
+      const cx = rect.left - stageRect.left + rect.width / 2;
+      const cy = rect.top - stageRect.top + 40;
+      for (let i = 0; i < n; i++) {
+        const b = document.createElement('div');
+        b.className = 'bubble';
+        const size = 8 + Math.random() * 18;
+        b.style.width = size + 'px';
+        b.style.height = size + 'px';
+        b.style.left = (cx - 30 + Math.random() * 60) + 'px';
+        b.style.top = (cy - 10 + Math.random() * 40) + 'px';
+        b.style.animationDelay = (i * 100) + 'ms';
+        el.stage.appendChild(b);
+        setTimeout(() => b.remove(), 2200 + i * 100);
+      }
+    }
+
+    function bounce() {
+      el.catWrap.classList.remove('bouncing');
+      void el.catWrap.offsetWidth;
+      el.catWrap.classList.add('bouncing');
+    }
+
+    // ===== Actions =====
+    const ACTIONS = {
+      feed: () => {
+        if (state.sleeping) { speak('Zzz... shh!'); return; }
+        if (state.hunger > 95) { speak('Tô cheio! 🙀'); return; }
+        state.hunger = clamp(state.hunger + 35);
+        state.energy = clamp(state.energy + 5);
+        state.score += 10;
+        showBowl('#ffab40');
+        speak('Nhom nhom 🍗', 1400);
+        particles('🍗', 4);
+        bounce();
+      },
+      water: () => {
+        if (state.sleeping) { speak('Zzz...'); return; }
+        if (state.thirst > 95) { speak('Já bebi! 💧'); return; }
+        state.thirst = clamp(state.thirst + 40);
+        state.score += 8;
+        showBowl('#64b5f6');
+        speak('Slurp slurp 💧', 1400);
+        particles('💧', 3);
+      },
+      brush: () => {
+        if (state.sleeping) { speak('Tá dormindo...'); return; }
+        state.clean = clamp(state.clean + 15);
+        state.fun = clamp(state.fun + 10);
+        state.score += 12;
+        speak('Purr purr~ 💆', 1400);
+        particles('✨', 5);
+        bounce();
+      },
+      bath: () => {
+        if (state.sleeping) { speak('Zzz...'); return; }
+        if (state.clean > 95) { speak('Tô limpinho!'); return; }
+        state.clean = 100;
+        state.fun = clamp(state.fun - 10);
+        state.energy = clamp(state.energy - 5);
+        state.score += 15;
+        speak('Miau! 🛁', 1500);
+        bubbles(14);
+      },
+      play: () => {
+        if (state.sleeping) { speak('Zzz...'); return; }
+        if (state.energy < 15) { speak('Cansadinho 😿'); return; }
+        state.fun = clamp(state.fun + 30);
+        state.energy = clamp(state.energy - 12);
+        state.hunger = clamp(state.hunger - 4);
+        state.score += 14;
+        showYarn();
+        speak('Nyaa~ 🧶', 1400);
+        particles('💖', 6);
+        bounce();
+      },
+      sleep: () => {
+        if (state.sleeping) {
+          state.sleeping = false;
+          speak('Acordei! 😺');
+        } else {
+          state.sleeping = true;
+          speak('Boa noite... 💤', 1800);
+        }
+      },
+    };
+
+    function showBowl(color) {
+      el.bowl.style.setProperty('--bowl-content', color);
+      const stageW = el.stage.clientWidth;
+      el.bowl.style.left = (stageW / 2 - 80) + 'px';
+      el.bowl.classList.add('show');
+      clearTimeout(showBowl._t);
+      showBowl._t = setTimeout(() => el.bowl.classList.remove('show'), 1400);
+    }
+
+    function showYarn() {
+      const stageW = el.stage.clientWidth;
+      el.yarn.style.left = (stageW / 2 + 50) + 'px';
+      el.yarn.classList.add('show');
+      clearTimeout(showYarn._t);
+      showYarn._t = setTimeout(() => el.yarn.classList.remove('show'), 1500);
+    }
+
+    // ===== Wire up =====
+    document.querySelectorAll('.action').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const a = btn.dataset.action;
+        if (ACTIONS[a]) {
+          ACTIONS[a]();
+          render();
+          save();
+        }
+      });
+    });
+
+    el.catWrap.addEventListener('click', () => {
+      if (state.sleeping) {
+        speak('Shh... 💤');
+        return;
+      }
+      state.fun = clamp(state.fun + 3);
+      state.score += 1;
+      bounce();
+      const greets = ['Miau!', 'Nyaa~', 'Purrr 💕', 'Oi! :3', 'Prrr~'];
+      speak(greets[Math.floor(Math.random() * greets.length)], 1100);
+      render();
+      save();
+    });
+
+    el.catName.addEventListener('input', (e) => {
+      state.name = e.target.value.trim() || 'Mingau';
+      save();
+    });
+
+    el.resetBtn.addEventListener('click', () => {
+      if (confirm('Recomeçar com um gatinho novinho? (Perde a pontuação)')) {
+        localStorage.removeItem(SAVE_KEY);
+        state = defaultState();
+        render();
+        save();
+      }
+    });
+
+    // ===== Game loop =====
+    function tick() {
+      applyDecay(state, TICK_MS / 1000);
+      // periodic complaints
+      if (!state.sleeping && Math.random() < 0.06) {
+        if (state.hunger < 25) speak('Tô com fome... 😿');
+        else if (state.thirst < 25) speak('Sedinho 💧');
+        else if (state.clean < 30) speak('Eca, sujinho 🙀');
+        else if (state.fun < 25) speak('Brinca comigo? 🧶');
+        else if (state.energy < 20) speak('Sono... 💤');
+      }
+      render();
+      save();
+    }
+
+    render();
+    setInterval(tick, TICK_MS);
+  })();
+  </script>
+</body>
+</html>
