@@ -1176,6 +1176,12 @@ function showScreen(id) {
 // ══════════════════════════════════════════════
 // AUTH
 // ══════════════════════════════════════════════
+function abrirWaze(appUrl, webUrl) {
+  // Tenta abrir o app Waze via deep link; fallback para o site após 1.5s
+  window.location.href = appUrl;
+  setTimeout(() => { window.location.href = webUrl; }, 1500);
+}
+
 function doLogin(name) {
   const expiresAt = Date.now() + 365 * 24 * 60 * 60 * 1000; // 1 ano
   localStorage.setItem('vf_user', JSON.stringify({ name, expiresAt }));
@@ -1261,7 +1267,9 @@ function renderCalendarEventsFiltered() {
     const timeStr = date && !isNaN(date)
       ? date.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit' }) + (ev.start.includes('T') ? ' ' + date.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' }) : '')
       : '';
-    const mapsUrl = ev.location ? `https://waze.com/ul?q=${encodeURIComponent(ev.location)}&navigate=yes` : null;
+    const wazeAddr = ev.location ? encodeURIComponent(ev.location) : null;
+    const mapsUrl = wazeAddr ? `waze://ul?q=${wazeAddr}&navigate=yes` : null;
+    const mapsUrlFallback = wazeAddr ? `https://waze.com/ul?q=${wazeAddr}&navigate=yes` : null;
 
     // Estilos do card: verde se concluído, vermelho se atrasado, padrão caso contrário
     const cardStyle = isDone
@@ -1290,7 +1298,7 @@ function renderCalendarEventsFiltered() {
       ${ev.description ? `<div style="font-size: 18px;color:#555;margin-top:6px;line-height:1.45;white-space:pre-line;background:#f9f9f9;border-radius:8px;padding:8px 10px;border-left:3px solid #e87722;">${escHtml(ev.description)}</div>` : ''}
       <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;">
         <a href="${ev.htmlLink || 'https://calendar.google.com/calendar/r'}" target="_blank" style="flex:1;min-width:80px;padding:7px 4px;background:#fff3e0;color:#e87722;border:1px solid #fed7aa;border-radius:8px;font-size: 15px;font-weight:600;text-align:center;text-decoration:none;">📅 Agenda</a>
-        ${mapsUrl ? `<a href="${mapsUrl}" target="_blank" style="flex:1;min-width:80px;padding:7px 4px;background:#e8f0fe;color:#1a4fd6;border:1px solid #c5cef9;border-radius:8px;font-size:15px;font-weight:600;text-align:center;text-decoration:none;">🔵 Waze</a>` : ''}
+        ${mapsUrl ? `<button onclick="abrirWaze('${mapsUrl}','${mapsUrlFallback}')" style="flex:1;min-width:80px;padding:7px 4px;background:#e8f0fe;color:#1a4fd6;border:1px solid #c5cef9;border-radius:8px;font-size:15px;font-weight:600;text-align:center;cursor:pointer;">🔵 Waze</button>` : ''}
         ${btnMedicao}
       </div>
     </div>`;
