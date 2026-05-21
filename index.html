@@ -946,12 +946,8 @@
         </div>
       </div>
       <div class="form-group">
-        <label class="form-label">Responsável <span style="font-size: 15px;color:var(--gray-500)">(síndico/zelador)</span></label>
-        <input class="form-input" id="f-ac" type="text" placeholder="Responsável (síndico/zelador)">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Celular do Responsável</label>
-        <input class="form-input" id="f-celular" type="tel" placeholder="(00) 00000-0000">
+        <label class="form-label">Quem acompanhou a visita</label>
+        <input class="form-input" id="f-ac" type="text" placeholder="Nome de quem acompanhou">
       </div>
       <div class="form-group">
         <label class="form-label">Garantia</label>
@@ -1181,7 +1177,7 @@ function showScreen(id) {
 // AUTH
 // ══════════════════════════════════════════════
 function doLogin(name) {
-  const expiresAt = Date.now() + 30 * 24 * 60 * 60 * 1000; // 30 dias
+  const expiresAt = Date.now() + 365 * 24 * 60 * 60 * 1000; // 1 ano
   localStorage.setItem('vf_user', JSON.stringify({ name, expiresAt }));
   currentUser = name;
   showHome();
@@ -1376,6 +1372,15 @@ function deleteMeasurement(id) {
 // HOME
 // ══════════════════════════════════════════════
 function showHome() {
+  // Renova sessão a cada abertura da home (sliding expiry — mantém logado enquanto usa o app)
+  try {
+    const stored = JSON.parse(localStorage.getItem('vf_user') || '{}');
+    if (stored.name) {
+      stored.expiresAt = Date.now() + 365 * 24 * 60 * 60 * 1000;
+      localStorage.setItem('vf_user', JSON.stringify(stored));
+    }
+  } catch(e) {}
+
   document.getElementById('home-greeting').textContent = `Olá, ${currentUser}`;
   document.getElementById('home-date').textContent = formatDateFull(Date.now());
   updateOnlineBadge();
@@ -1709,7 +1714,6 @@ function openForm(step) {
     setTimeout(() => document.getElementById('f-cep').dispatchEvent(new Event('input')), 100);
   }
   document.getElementById('f-ac').value = currentMeasurement.ac || '';
-  document.getElementById('f-celular').value = currentMeasurement.celular || '';
   // Garantia (radio no Step 1)
   setRadioValue('f-garantia', currentMeasurement.garantia || '15');
 
@@ -1802,7 +1806,7 @@ function collectCurrentStep() {
     currentMeasurement.cidade = cidadeVal + (ufVal ? ' - ' + ufVal : '');
     currentMeasurement.cep = document.getElementById('f-cep').value.trim();
     currentMeasurement.ac = document.getElementById('f-ac').value.trim();
-    currentMeasurement.celular = document.getElementById('f-celular').value.trim();
+    currentMeasurement.celular = '';
     const garantiaInput = document.querySelector('input[name="garantia"]:checked');
     currentMeasurement.garantia = garantiaInput ? garantiaInput.value : '15';
   }
@@ -2644,7 +2648,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const googleName = decodeURIComponent(params.get('google_name') || '');
     const googleEmail = decodeURIComponent(params.get('google_email') || '');
     if (googleToken) {
-      const expiresAt = Date.now() + 7 * 24 * 60 * 60 * 1000;
+      const expiresAt = Date.now() + 365 * 24 * 60 * 60 * 1000; // 1 ano
       const fallback = googleName || googleEmail;
       // Salva provisoriamente com nome do Google e mostra a home
       localStorage.setItem('vf_user', JSON.stringify({ name: fallback, expiresAt, googleToken, googleEmail }));
