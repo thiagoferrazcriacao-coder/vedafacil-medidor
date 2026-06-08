@@ -207,6 +207,10 @@
       padding: 14px;
       margin-bottom: 10px;
     }
+    .measurement-card.card-incompleto {
+      border-left: 4px solid #f97316;
+      background: #fffbf5;
+    }
     .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
     .card-client { font-weight: 700; font-size: 23px; color: var(--gray-900); }
     .card-date { font-size: 18px; color: var(--gray-500); }
@@ -844,6 +848,66 @@
 </div>
 
 <!-- ══════════════════════════════════════════════
+     MASTER MODE — admin visualiza como qualquer medidor
+     ══════════════════════════════════════════════ -->
+<div id="screen-master-login" class="screen" style="background:linear-gradient(160deg,#1a1a1a 0%,#3a2010 100%);align-items:center;justify-content:center;padding:32px;">
+  <div class="login-box" style="background:rgba(255,255,255,0.98);max-width:380px;width:100%">
+    <div style="font-size:54px;text-align:center;margin-bottom:8px">👁</div>
+    <div class="login-title" style="color:#e87722;text-align:center">Acesso Master</div>
+    <div class="login-subtitle" style="color:#666;text-align:center;font-size:14px">Visualize o painel de qualquer medidor sem precisar do Gmail dele</div>
+
+    <div id="master-med-senha-bloco" style="margin-top:18px">
+      <label style="display:block;font-size:14px;font-weight:600;color:#374151;margin-bottom:6px">Senha master</label>
+      <input id="inp-master-med-senha" type="password" placeholder="Senha do painel admin"
+        style="width:100%;padding:12px;border:1.5px solid #ddd;border-radius:10px;font-size:15px;background:white;color:#333"
+        onkeydown="if(event.key==='Enter')doMedidorMasterLogin()">
+    </div>
+    <div id="master-med-ja-autenticado" style="display:none;margin-top:18px;background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:12px 14px">
+      <div style="font-size:14px;font-weight:700;color:#166534">✅ Sessão master ativa</div>
+      <div style="font-size:12px;color:#15803d;margin-top:2px">Selecione o medidor para trocar sem redigitar a senha.</div>
+    </div>
+
+    <div style="margin-top:14px">
+      <label style="display:block;font-size:14px;font-weight:600;color:#374151;margin-bottom:6px">Medidor a visualizar</label>
+      <select id="sel-master-medidor"
+        style="width:100%;padding:12px;border:1.5px solid #ddd;border-radius:10px;font-size:15px;background:white;color:#333">
+        <option value="">Carregando medidores...</option>
+      </select>
+    </div>
+
+    <button id="btn-master-med-entrar" onclick="doMedidorMasterLogin()"
+      style="width:100%;margin-top:18px;padding:14px;background:#e87722;color:white;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer">
+      👁 Visualizar medidor →
+    </button>
+    <p id="master-med-error" style="display:none;color:#dc2626;font-size:14px;margin-top:12px;text-align:center"></p>
+
+    <div id="master-med-sair-sessao-btn" style="display:none;margin-top:10px;text-align:center">
+      <button onclick="sairMasterMedidor(true)" style="background:none;border:none;font-size:13px;color:#9ca3af;cursor:pointer;padding:8px">🚪 Encerrar sessão master completamente</button>
+    </div>
+  </div>
+</div>
+
+<!-- Banner do modo master no medidor -->
+<div id="master-med-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:#1a1a1a;color:#f59340;font-size:12px;font-weight:700;text-align:center;padding:6px 12px;letter-spacing:0.5px">
+  👁 MODO MASTER &nbsp;·&nbsp; <span id="master-med-banner-nome"></span>
+  &nbsp;<button onclick="sairMasterMedidor(false)" style="background:#555;border:none;color:#fff;font-size:11px;font-weight:700;padding:2px 10px;border-radius:20px;cursor:pointer;margin-left:8px">🔄 Trocar medidor</button>
+  &nbsp;<button onclick="sairMasterMedidor(true)" style="background:#e87722;border:none;color:#fff;font-size:11px;font-weight:700;padding:2px 10px;border-radius:20px;cursor:pointer;margin-left:4px">Sair</button>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     BOTÃO HOME FLUTUANTE
+     Aparece em todas as telas exceto: home, login, master-login
+══════════════════════════════════════════════ -->
+<!-- Barra superior fixa com botão HOME — aparece em todas as telas exceto: home/login/master-login/success -->
+<div id="top-home-bar" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9000;background:linear-gradient(90deg,#c45d12,#e87722);color:white;padding:10px 16px;box-shadow:0 2px 8px rgba(0,0,0,0.18);display:none;align-items:center;justify-content:space-between;font-size:14px;font-weight:700;">
+  <button onclick="showHome()" style="background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.35);color:white;padding:6px 14px;border-radius:999px;font-size:14px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px" title="Voltar para Home">
+    🏠 Início
+  </button>
+  <span id="top-home-bar-title" style="opacity:0.95;letter-spacing:0.3px"></span>
+  <span style="width:90px"></span>
+</div>
+
+<!-- ══════════════════════════════════════════════
      SCREEN 2: HOME
 ══════════════════════════════════════════════ -->
 <div id="screen-home" class="screen">
@@ -867,6 +931,14 @@
 
     <button class="btn-new" onclick="startNewMeasurement()">
       <span style="font-size: 28px; line-height:1;">+</span> Nova Medição
+    </button>
+
+    <!-- Botão FAZER AGENDAMENTO — só aparece pra medidores com permissão (state.podeAgendar) -->
+    <button
+      id="btn-fazer-agendamento"
+      onclick="abrirNovaVisita()"
+      style="display:none;width:100%;padding:14px;margin-top:10px;background:linear-gradient(135deg,#0ea5e9,#0284c7);color:white;border:none;border-radius:var(--radius);font-size:17px;font-weight:700;letter-spacing:0.3px;cursor:pointer;box-shadow:0 4px 12px rgba(2,132,199,0.25);display:flex;align-items:center;justify-content:center;gap:8px;">
+      📅 FAZER AGENDAMENTO
     </button>
 
     <div class="section-title">Pendentes de envio</div>
@@ -900,14 +972,105 @@
 </div>
 
 <!-- ══════════════════════════════════════════════
+     SCREEN: NOVA VISITA (medidor agenda)
+══════════════════════════════════════════════ -->
+<div id="screen-nova-visita" class="screen">
+  <div style="background:linear-gradient(135deg,#0ea5e9,#0284c7);padding:18px 18px 22px;color:white;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+      <button onclick="cancelarNovaVisita()" style="background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.35);color:white;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;" title="Voltar">←</button>
+      <h1 style="font-size:22px;font-weight:800;margin:0;flex:1;">📅 Nova Visita</h1>
+    </div>
+    <div id="nova-visita-edit-badge" style="display:none;background:rgba(255,255,255,0.22);border-radius:6px;padding:4px 10px;font-size:12px;font-weight:600;margin-top:4px;width:fit-content;">✏️ Editando visita existente</div>
+  </div>
+  <div style="padding:18px;background:var(--gray-100);min-height:calc(100vh - 100px);">
+    <!-- Para quem? -->
+    <div id="nv-para-quem-bloco" style="background:white;border-radius:12px;padding:14px;margin-bottom:14px;border:2px solid #e0f2fe;">
+      <label style="font-size:12px;font-weight:700;color:#0369a1;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:8px;">👤 Para quem é esta visita?</label>
+      <div id="nv-para-quem-radios" style="display:flex;flex-direction:column;gap:8px;"></div>
+    </div>
+
+    <!-- Data e Hora -->
+    <div style="background:white;border-radius:12px;padding:14px;margin-bottom:14px;">
+      <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:4px;">Data</label>
+      <input type="date" id="nv-data" style="width:100%;padding:10px;border:1px solid #d1d5db;border-radius:8px;font-size:15px;margin-bottom:10px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div>
+          <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:4px;">Hora início</label>
+          <input type="time" id="nv-hora-inicio" style="width:100%;padding:10px;border:1px solid #d1d5db;border-radius:8px;font-size:15px;">
+        </div>
+        <div>
+          <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:4px;">Hora fim</label>
+          <input type="time" id="nv-hora-fim" style="width:100%;padding:10px;border:1px solid #d1d5db;border-radius:8px;font-size:15px;">
+        </div>
+      </div>
+      <div id="nv-conflito-almoco" style="display:none;background:#fef3c7;color:#92400e;border:1px solid #fcd34d;border-radius:6px;padding:6px 10px;font-size:12px;margin-top:8px;">
+        ⚠️ Horário conflita com seu almoço (12:00–13:30). Ajuste antes de salvar.
+      </div>
+    </div>
+
+    <!-- Cliente / endereço -->
+    <div style="background:white;border-radius:12px;padding:14px;margin-bottom:14px;">
+      <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:4px;">Nome do Condomínio *</label>
+      <input type="text" id="nv-cliente" placeholder="Ex: Condomínio Solar das Palmeiras" style="width:100%;padding:10px;border:1px solid #d1d5db;border-radius:8px;font-size:15px;margin-bottom:10px;">
+
+      <div style="display:grid;grid-template-columns:120px 1fr;gap:10px;margin-bottom:10px;">
+        <div>
+          <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:4px;">CEP</label>
+          <input type="text" id="nv-cep" placeholder="00000-000" maxlength="9" oninput="buscarCepNovaVisita(this.value)" style="width:100%;padding:10px;border:1px solid #d1d5db;border-radius:8px;font-size:15px;">
+        </div>
+        <div>
+          <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:4px;">Bairro</label>
+          <input type="text" id="nv-bairro" style="width:100%;padding:10px;border:1px solid #d1d5db;border-radius:8px;font-size:15px;">
+        </div>
+      </div>
+      <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:4px;">Endereço (Rua, número)</label>
+      <input type="text" id="nv-endereco" placeholder="Rua das Flores, 123" style="width:100%;padding:10px;border:1px solid #d1d5db;border-radius:8px;font-size:15px;margin-bottom:10px;">
+      <div style="display:grid;grid-template-columns:1fr 80px;gap:10px;">
+        <div>
+          <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:4px;">Cidade</label>
+          <input type="text" id="nv-cidade" style="width:100%;padding:10px;border:1px solid #d1d5db;border-radius:8px;font-size:15px;">
+        </div>
+        <div>
+          <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:4px;">UF</label>
+          <input type="text" id="nv-estado" maxlength="2" style="width:100%;padding:10px;border:1px solid #d1d5db;border-radius:8px;font-size:15px;text-transform:uppercase;">
+        </div>
+      </div>
+    </div>
+
+    <!-- Contato e obs -->
+    <div style="background:white;border-radius:12px;padding:14px;margin-bottom:14px;">
+      <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:4px;">Responsável (síndico/zelador)</label>
+      <input type="text" id="nv-responsavel" placeholder="Nome do responsável" style="width:100%;padding:10px;border:1px solid #d1d5db;border-radius:8px;font-size:15px;margin-bottom:10px;">
+
+      <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:4px;">Telefone</label>
+      <input type="tel" id="nv-telefone" placeholder="(00) 00000-0000" style="width:100%;padding:10px;border:1px solid #d1d5db;border-radius:8px;font-size:15px;margin-bottom:10px;">
+
+      <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:4px;">Observação</label>
+      <textarea id="nv-observacao" rows="3" placeholder="Ex: portaria do lado direito, etc." style="width:100%;padding:10px;border:1px solid #d1d5db;border-radius:8px;font-size:15px;resize:vertical;"></textarea>
+    </div>
+
+    <!-- Erros -->
+    <div id="nv-erro" style="display:none;background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;border-radius:8px;padding:10px;font-size:13px;margin-bottom:10px;"></div>
+
+    <!-- Ações -->
+    <button id="nv-salvar-btn" onclick="salvarNovaVisita()" style="width:100%;padding:14px;background:#0284c7;color:white;border:none;border-radius:12px;font-size:17px;font-weight:700;cursor:pointer;margin-bottom:8px;">
+      ✓ Salvar agendamento
+    </button>
+    <button id="nv-excluir-btn" onclick="excluirVisita()" style="display:none;width:100%;padding:12px;background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:8px;">
+      🗑 Cancelar / excluir esta visita
+    </button>
+    <button onclick="cancelarNovaVisita()" style="width:100%;padding:12px;background:transparent;color:#6b7280;border:1px solid #d1d5db;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;">
+      Voltar sem salvar
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
      SCREEN 3-5: FORM (3 steps)
 ══════════════════════════════════════════════ -->
 <div id="screen-form" class="screen">
   <div class="form-header">
-    <div style="display:flex;align-items:center;justify-content:space-between;">
-      <div class="form-title" id="form-step-title">Dados do cliente</div>
-      <button onclick="showHome()" style="background:none;border:none;color:white;font-size: 28px;cursor:pointer;padding:4px 8px;opacity:0.85;" title="Voltar ao início">🏠</button>
-    </div>
+    <div class="form-title" id="form-step-title">Dados do cliente</div>
     <div class="progress-bar-wrap">
       <div class="progress-bar-fill" id="progress-fill" style="width:33%"></div>
     </div>
@@ -1171,6 +1334,18 @@ function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + id).classList.add('active');
   window.scrollTo(0, 0);
+  // Barra superior com botão HOME — fixa no topo em todas as telas exceto: home, login, master-login, success
+  const topBar = document.getElementById('top-home-bar');
+  if (topBar) {
+    const escondidoEm = ['home', 'login', 'master-login', 'success'];
+    const mostrar = !escondidoEm.includes(id);
+    topBar.style.display = mostrar ? 'flex' : 'none';
+    document.body.style.paddingTop = mostrar ? '46px' : '';
+    // Atualiza o título do topo
+    const titulo = id === 'form' ? '📋 Medição em andamento' : '';
+    const titleEl = document.getElementById('top-home-bar-title');
+    if (titleEl) titleEl.textContent = titulo;
+  }
 }
 
 // ══════════════════════════════════════════════
@@ -1189,6 +1364,150 @@ function doLogin(name) {
   showHome();
 }
 
+// ══════════════════════════════════════════════
+// MASTER MODE — admin visualiza como qualquer medidor sem Gmail
+// ══════════════════════════════════════════════
+async function abrirTelaMasterMedidor() {
+  showScreen('master-login');
+  atualizarUIMasterMedidor();
+  // Carrega lista de medidores
+  const PANEL_BASE = WEBHOOK_URL.replace('/api/medicao', '');
+  try {
+    const r = await fetch(`${PANEL_BASE}/api/medidor/master-medidores`);
+    const meds = r.ok ? await r.json() : [];
+    const sel = document.getElementById('sel-master-medidor');
+    sel.innerHTML = '<option value="">— Selecione o medidor —</option>';
+    meds.forEach(m => {
+      const o = document.createElement('option');
+      o.value = m.email;
+      o.textContent = m.nome + ' (' + m.email + ')';
+      sel.appendChild(o);
+    });
+  } catch (e) {
+    document.getElementById('sel-master-medidor').innerHTML = '<option value="">Erro ao carregar medidores</option>';
+  }
+}
+
+function atualizarUIMasterMedidor() {
+  const temSessao = !!sessionStorage.getItem('vf_master_med_token');
+  const senhaBloco = document.getElementById('master-med-senha-bloco');
+  const jaAutent   = document.getElementById('master-med-ja-autenticado');
+  const sairBtn    = document.getElementById('master-med-sair-sessao-btn');
+  if (senhaBloco) senhaBloco.style.display = temSessao ? 'none' : '';
+  if (jaAutent)   jaAutent.style.display   = temSessao ? '' : 'none';
+  if (sairBtn)    sairBtn.style.display    = temSessao ? '' : 'none';
+}
+
+async function doMedidorMasterLogin() {
+  const PANEL_BASE = WEBHOOK_URL.replace('/api/medicao', '');
+  const medidorEmail = document.getElementById('sel-master-medidor').value;
+  const errEl = document.getElementById('master-med-error');
+  if (!medidorEmail) {
+    errEl.textContent = 'Selecione o medidor';
+    errEl.style.display = '';
+    return;
+  }
+  errEl.style.display = 'none';
+
+  const tokenSalvo = sessionStorage.getItem('vf_master_med_token');
+
+  // Se já tem token master válido, só troca de medidor
+  if (tokenSalvo) {
+    try {
+      const r = await fetch(`${PANEL_BASE}/api/medidor/master-login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + tokenSalvo },
+        body: JSON.stringify({ masterPassword: '_use_token_', medidorEmail }),
+      });
+      // Token ainda válido → o servidor não emitirá nada porque a senha está errada
+      // então temos que limpar e pedir de novo. Vamos usar uma abordagem mais simples:
+      // tentar primeiro com a senha em sessionStorage também
+      const senhaSalva = sessionStorage.getItem('vf_master_med_senha');
+      if (senhaSalva) {
+        const r2 = await fetch(`${PANEL_BASE}/api/medidor/master-login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ masterPassword: senhaSalva, medidorEmail }),
+        });
+        const d2 = await r2.json();
+        if (r2.ok && d2.token) {
+          _entrarComoMedidor(d2);
+          return;
+        }
+      }
+      // Sessão expirada — limpa e pede senha
+      sessionStorage.removeItem('vf_master_med_token');
+      sessionStorage.removeItem('vf_master_med_senha');
+      atualizarUIMasterMedidor();
+      errEl.textContent = 'Sessão expirada. Digite a senha novamente.';
+      errEl.style.display = '';
+    } catch (e) {
+      errEl.textContent = 'Erro de conexão';
+      errEl.style.display = '';
+    }
+    return;
+  }
+
+  // Primeira vez: precisa da senha
+  const senha = document.getElementById('inp-master-med-senha').value;
+  if (!senha) {
+    errEl.textContent = 'Digite a senha master';
+    errEl.style.display = '';
+    return;
+  }
+  try {
+    const r = await fetch(`${PANEL_BASE}/api/medidor/master-login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ masterPassword: senha, medidorEmail }),
+    });
+    const data = await r.json();
+    if (!r.ok) {
+      errEl.textContent = data.error || 'Senha incorreta';
+      errEl.style.display = '';
+      return;
+    }
+    sessionStorage.setItem('vf_master_med_token', data.token);
+    sessionStorage.setItem('vf_master_med_senha', senha); // necessário para trocar de medidor depois
+    _entrarComoMedidor(data);
+  } catch (e) {
+    errEl.textContent = 'Erro de conexão';
+    errEl.style.display = '';
+  }
+}
+
+function _entrarComoMedidor(data) {
+  // Salva sessão como se fosse o medidor (token JWT master substitui o Google token)
+  const expiresAt = Date.now() + 12 * 60 * 60 * 1000; // 12h (mesmo TTL do JWT)
+  localStorage.setItem('vf_user', JSON.stringify({
+    name: data.medidor.nome,
+    googleEmail: data.medidor.email,
+    googleToken: data.token,   // token JWT master usado como se fosse Google token
+    isMaster: true,
+    expiresAt,
+  }));
+  currentUser = data.medidor.nome;
+  document.getElementById('master-med-banner-nome').textContent = data.medidor.nome;
+  document.getElementById('master-med-banner').style.display = '';
+  document.querySelectorAll('.screen').forEach(s => s.style.paddingTop = '32px');
+  showHome();
+}
+
+function sairMasterMedidor(sairCompletamente = false) {
+  document.getElementById('master-med-banner').style.display = 'none';
+  document.querySelectorAll('.screen').forEach(s => s.style.paddingTop = '');
+  localStorage.removeItem('vf_user');
+  currentUser = null;
+
+  if (sairCompletamente) {
+    sessionStorage.removeItem('vf_master_med_token');
+    sessionStorage.removeItem('vf_master_med_senha');
+    document.getElementById('inp-master-med-senha').value = '';
+  }
+  atualizarUIMasterMedidor();
+  showScreen('master-login');
+}
+
 function doLogout() {
   localStorage.removeItem('vf_user');
   currentUser = null;
@@ -1201,18 +1520,360 @@ function doLoginGoogle() {
   window.location.href = `${PANEL_BASE}/api/auth/google?source=medidor`;
 }
 
+// ── Carregar visitas da agenda própria Vedafacil ──────────────────────────────
+async function loadVisitasVedafacil(token) {
+  const PANEL_BASE = WEBHOOK_URL.replace('/api/medicao', '');
+  try {
+    const r = await fetch(`${PANEL_BASE}/api/visitas/medidor`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!r.ok) return [];
+    const { visitas = [] } = await r.json();
+    return visitas.map(v => ({
+      id:          'vf_' + v._id,
+      visitaId:    v._id,
+      _id:         v._id,                // pra editar/excluir via abrirNovaVisita()
+      title:       v.nomeCondominio || '(sem título)',
+      nomeCondominio: v.nomeCondominio || '',
+      start:       v.dataHora || '',
+      end:         v.dataHoraFim || v.dataHora || '',
+      dataHora:    v.dataHora || '',
+      dataHoraFim: v.dataHoraFim || '',
+      location:    [v.endereco, v.bairro, v.cidade, v.estado].filter(Boolean).join(', '),
+      // Campos separados — garante que o medidor recebe endereço estruturado
+      endereco:    v.endereco || '',
+      bairro:      v.bairro   || '',
+      cidade:      v.cidade   || '',
+      estado:      v.estado   || '',
+      cep:         v.cep      || '',
+      nomeResponsavel: v.nomeResponsavel || '',
+      telefone:    v.telefone || '',
+      observacao:  v.observacao || '',
+      medidorEmail: v.medidorEmail || '',
+      medidorNome: v.medidorNome || '',
+      fotosCliente: Array.isArray(v.fotosCliente) ? v.fotosCliente : [],
+      // Flags vindos do backend (definem UX no medidor)
+      propria:     !!v.propria,             // true se a visita é do medidor logado
+      podeEditar:  !!v.podeEditar,          // true se foi criada por medidor (não escritório)
+      criadorEhEscritorio: !!v.criadorEhEscritorio,
+      description: (v.nomeResponsavel ? 'AC: ' + v.nomeResponsavel + '\n' : '')
+                 + (v.telefone ? 'Cel: ' + v.telefone + '\n' : '')
+                 + (v.observacao || ''),
+      fonte:       'vedafacil',
+    }));
+  } catch { return []; }
+}
+
+// ══════════════════════════════════════════════
+// AGENDAMENTO PELO MEDIDOR (botão FAZER AGENDAMENTO)
+// ══════════════════════════════════════════════
+// Estado global das permissões de agendamento.
+// Carregado uma vez no boot — define se o botão na home aparece e pra quem pode agendar.
+window.MEDIDOR_INFO = { podeAgendar: false, agendaPara: [], meuEmail: '', meuNome: '' };
+// Visita sendo editada (null = criação)
+let _visitaEdit = null;
+
+async function carregarPermissoesAgendamento(token) {
+  const PANEL_BASE = WEBHOOK_URL.replace('/api/medicao', '');
+  try {
+    const r = await fetch(`${PANEL_BASE}/api/medidor/agenda-para`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!r.ok) return;
+    const d = await r.json();
+    window.MEDIDOR_INFO = {
+      podeAgendar: !!d.podeAgendar,
+      agendaPara: Array.isArray(d.agendaPara) ? d.agendaPara : [],
+      meuEmail: d.meuEmail || '',
+      meuNome: d.meuNome || '',
+    };
+    // Mostra/esconde o botão na home
+    const btn = document.getElementById('btn-fazer-agendamento');
+    if (btn) btn.style.display = window.MEDIDOR_INFO.podeAgendar ? 'flex' : 'none';
+  } catch (e) {
+    console.warn('Falha ao carregar permissões de agendamento:', e?.message || e);
+  }
+}
+
+// Abre tela de criação. Se passar uma visita existente, abre em modo edição.
+function abrirNovaVisita(visita) {
+  _visitaEdit = visita || null;
+
+  // Constrói radios "Para quem?"
+  const radiosEl = document.getElementById('nv-para-quem-radios');
+  const opcoes = [
+    { email: window.MEDIDOR_INFO.meuEmail, nome: 'Você (' + (window.MEDIDOR_INFO.meuNome || window.MEDIDOR_INFO.meuEmail) + ')' },
+    ...window.MEDIDOR_INFO.agendaPara.map(o => ({ email: o.email, nome: o.name }))
+  ];
+  const emailSelecionado = visita?.medidorEmail || window.MEDIDOR_INFO.meuEmail;
+  radiosEl.innerHTML = opcoes.map(o => `
+    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:8px 10px;border-radius:8px;border:1.5px solid ${o.email === emailSelecionado ? '#0284c7' : '#e5e7eb'};background:${o.email === emailSelecionado ? '#f0f9ff' : 'white'};">
+      <input type="radio" name="nv-medidor" value="${o.email}" ${o.email === emailSelecionado ? 'checked' : ''} onchange="document.querySelectorAll('[name=nv-medidor]').forEach(r => { r.closest('label').style.background=r.checked?'#f0f9ff':'white'; r.closest('label').style.borderColor=r.checked?'#0284c7':'#e5e7eb'; });" style="width:18px;height:18px;accent-color:#0284c7;">
+      <span style="font-size:14px;color:#1f2937;font-weight:500;">${o.nome}</span>
+    </label>
+  `).join('');
+  // Se não pode agendar pra outros (lista vazia), esconde o bloco — fica implícito que é pra ele
+  document.getElementById('nv-para-quem-bloco').style.display = window.MEDIDOR_INFO.agendaPara.length > 0 ? 'block' : 'none';
+
+  // Preenche campos
+  if (visita) {
+    document.getElementById('nova-visita-edit-badge').style.display = 'block';
+    document.getElementById('nv-excluir-btn').style.display = 'block';
+    document.getElementById('nv-salvar-btn').textContent = '💾 Salvar alterações';
+    const dataHora = (visita.dataHora || visita.start || '').split('T');
+    document.getElementById('nv-data').value = dataHora[0] || '';
+    document.getElementById('nv-hora-inicio').value = (dataHora[1] || '').slice(0,5);
+    const fim = (visita.dataHoraFim || visita.end || '').split('T');
+    document.getElementById('nv-hora-fim').value = (fim[1] || '').slice(0,5);
+    document.getElementById('nv-cliente').value = visita.nomeCondominio || visita.title || '';
+    document.getElementById('nv-cep').value = visita.cep || '';
+    document.getElementById('nv-endereco').value = visita.endereco || '';
+    document.getElementById('nv-bairro').value = visita.bairro || '';
+    document.getElementById('nv-cidade').value = visita.cidade || '';
+    document.getElementById('nv-estado').value = visita.estado || '';
+    document.getElementById('nv-responsavel').value = visita.nomeResponsavel || '';
+    document.getElementById('nv-telefone').value = visita.telefone || '';
+    document.getElementById('nv-observacao').value = visita.observacao || '';
+  } else {
+    document.getElementById('nova-visita-edit-badge').style.display = 'none';
+    document.getElementById('nv-excluir-btn').style.display = 'none';
+    document.getElementById('nv-salvar-btn').textContent = '✓ Salvar agendamento';
+    // Defaults pra criação
+    const hoje = new Date(); hoje.setDate(hoje.getDate() + 1); // amanhã
+    document.getElementById('nv-data').value = hoje.toISOString().slice(0,10);
+    document.getElementById('nv-hora-inicio').value = '09:00';
+    document.getElementById('nv-hora-fim').value = '10:00';
+    ['cliente','cep','endereco','bairro','cidade','estado','responsavel','telefone','observacao']
+      .forEach(f => { const el = document.getElementById('nv-'+f); if (el) el.value = ''; });
+  }
+  document.getElementById('nv-erro').style.display = 'none';
+  document.getElementById('nv-conflito-almoco').style.display = 'none';
+
+  showScreen('nova-visita');
+}
+
+function cancelarNovaVisita() {
+  _visitaEdit = null;
+  showScreen('home');
+}
+
+// Auto-fill via ViaCEP
+async function buscarCepNovaVisita(cep) {
+  const limpo = (cep || '').replace(/\D/g, '');
+  // Auto-formato 00000-000
+  if (limpo.length >= 6) {
+    document.getElementById('nv-cep').value = limpo.slice(0,5) + '-' + limpo.slice(5,8);
+  }
+  if (limpo.length !== 8) return;
+  try {
+    const r = await fetch(`https://viacep.com.br/ws/${limpo}/json/`);
+    const d = await r.json();
+    if (d.erro) return;
+    if (d.logradouro) document.getElementById('nv-endereco').value = d.logradouro;
+    if (d.bairro)     document.getElementById('nv-bairro').value   = d.bairro;
+    if (d.localidade) document.getElementById('nv-cidade').value   = d.localidade;
+    if (d.uf)         document.getElementById('nv-estado').value   = d.uf;
+  } catch {}
+}
+
+// Verifica conflito com almoço (12:00–13:30 default — backend valida de novo no salvar)
+function _verificaConflitoAlmoco() {
+  const ini = document.getElementById('nv-hora-inicio').value;
+  const fim = document.getElementById('nv-hora-fim').value;
+  if (!ini) return false;
+  const inicioAlmoco = '12:00', fimAlmoco = '13:30';
+  // Conflito: começa antes do fim do almoço E termina depois do início
+  const conflita = ini < fimAlmoco && (fim || ini) > inicioAlmoco;
+  document.getElementById('nv-conflito-almoco').style.display = conflita ? 'block' : 'none';
+  return conflita;
+}
+['nv-hora-inicio','nv-hora-fim'].forEach(id => {
+  document.addEventListener('DOMContentLoaded', () => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('change', _verificaConflitoAlmoco);
+  });
+});
+
+async function salvarNovaVisita() {
+  const erroEl = document.getElementById('nv-erro');
+  erroEl.style.display = 'none';
+
+  const medidorEmailSel = document.querySelector('[name=nv-medidor]:checked')?.value || window.MEDIDOR_INFO.meuEmail;
+  const data = document.getElementById('nv-data').value;
+  const horaIni = document.getElementById('nv-hora-inicio').value;
+  const horaFim = document.getElementById('nv-hora-fim').value;
+  const cliente = document.getElementById('nv-cliente').value.trim();
+
+  if (!data)    { erroEl.textContent = 'Informe a data'; erroEl.style.display = 'block'; return; }
+  if (!horaIni) { erroEl.textContent = 'Informe a hora de início'; erroEl.style.display = 'block'; return; }
+  if (!cliente) { erroEl.textContent = 'Informe o nome do condomínio'; erroEl.style.display = 'block'; return; }
+  if (horaFim && horaFim <= horaIni) {
+    erroEl.textContent = 'A hora de fim deve ser depois da hora de início';
+    erroEl.style.display = 'block';
+    return;
+  }
+  if (_verificaConflitoAlmoco()) {
+    erroEl.textContent = '⚠️ O horário conflita com o almoço (12:00–13:30). Ajuste antes de salvar.';
+    erroEl.style.display = 'block';
+    return;
+  }
+
+  const payload = {
+    medidorEmail: medidorEmailSel,
+    dataHora: `${data}T${horaIni}`,
+    dataHoraFim: horaFim ? `${data}T${horaFim}` : '',
+    nomeCondominio: cliente,
+    cep: document.getElementById('nv-cep').value.trim(),
+    endereco: document.getElementById('nv-endereco').value.trim(),
+    bairro: document.getElementById('nv-bairro').value.trim(),
+    cidade: document.getElementById('nv-cidade').value.trim(),
+    estado: document.getElementById('nv-estado').value.trim().toUpperCase(),
+    nomeResponsavel: document.getElementById('nv-responsavel').value.trim(),
+    telefone: document.getElementById('nv-telefone').value.trim(),
+    observacao: document.getElementById('nv-observacao').value.trim(),
+  };
+
+  const token = getStoredToken();
+  if (!token) { erroEl.textContent = 'Sessão expirada — refaça o login.'; erroEl.style.display = 'block'; return; }
+
+  const btn = document.getElementById('nv-salvar-btn');
+  const txtOriginal = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '⏳ Salvando...';
+  try {
+    const PANEL_BASE = WEBHOOK_URL.replace('/api/medicao', '');
+    const url = _visitaEdit?._id
+      ? `${PANEL_BASE}/api/medidor/visitas/${_visitaEdit._id}`
+      : `${PANEL_BASE}/api/medidor/visitas`;
+    const method = _visitaEdit?._id ? 'PUT' : 'POST';
+    const r = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify(payload),
+    });
+    const d = await r.json();
+    if (!r.ok) {
+      erroEl.textContent = d.error || `Erro ${r.status}`;
+      erroEl.style.display = 'block';
+      return;
+    }
+    // Sucesso
+    _visitaEdit = null;
+    showScreen('home');
+    if (typeof loadServerCalendarEvents === 'function') loadServerCalendarEvents(token);
+    alert('✅ Visita salva com sucesso!');
+  } catch (e) {
+    erroEl.textContent = 'Erro de rede: ' + (e?.message || e);
+    erroEl.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = txtOriginal;
+  }
+}
+
+async function excluirVisita() {
+  if (!_visitaEdit?._id) return;
+  if (!confirm('Cancelar esta visita? Ela vai para a Lixeira (pode ser restaurada em 30 dias).')) return;
+  const token = getStoredToken();
+  if (!token) return;
+  const PANEL_BASE = WEBHOOK_URL.replace('/api/medicao', '');
+  try {
+    const r = await fetch(`${PANEL_BASE}/api/medidor/visitas/${_visitaEdit._id}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${token}` },
+    });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) {
+      alert('❌ ' + (d.error || `Erro ${r.status}`));
+      return;
+    }
+    _visitaEdit = null;
+    showScreen('home');
+    if (typeof loadServerCalendarEvents === 'function') loadServerCalendarEvents(token);
+  } catch (e) {
+    alert('❌ Erro de rede: ' + (e?.message || e));
+  }
+}
+
+// Tenta abrir visita pra editar. Se foi criada pelo escritório, mostra aviso e bloqueia.
+function tentarEditarVisita(idx) {
+  const events = window._calendarEvents || [];
+  const ev = events[idx];
+  if (!ev) return;
+  // Visita criada pelo escritório → não pode editar pelo app
+  if (ev.criadorEhEscritorio || ev.podeEditar === false) {
+    alert(
+      'Esta visita foi criada pelo escritório.\n\n' +
+      'Para alterar a data, horário ou cancelar, fale com a equipe do escritório.\n\n' +
+      'Você pode criar NOVAS visitas pelo botão "FAZER AGENDAMENTO" na home.'
+    );
+    return;
+  }
+  // Constrói objeto compatível com abrirNovaVisita (que espera o formato Visita do backend)
+  abrirNovaVisita({
+    _id: ev._id || ev.visitaId,
+    nomeCondominio: ev.nomeCondominio || ev.title,
+    dataHora: ev.dataHora || ev.start,
+    dataHoraFim: ev.dataHoraFim || ev.end,
+    cep: ev.cep, endereco: ev.endereco, bairro: ev.bairro, cidade: ev.cidade, estado: ev.estado,
+    nomeResponsavel: ev.nomeResponsavel, telefone: ev.telefone, observacao: ev.observacao,
+    medidorEmail: ev.medidorEmail,
+  });
+}
+
+// Helper pra pegar o token armazenado (JWT do Google OAuth)
+function getStoredToken() {
+  try {
+    const s = JSON.parse(localStorage.getItem('vf_user') || '{}');
+    return s.googleToken || null;
+  } catch { return null; }
+}
+
+// ── Busca o modo da agenda (com cache de 5 min) ───────────────────────────────
+async function getAgendaMode(token) {
+  try {
+    const PANEL_BASE = WEBHOOK_URL.replace('/api/medicao', '');
+    const cached = JSON.parse(localStorage.getItem('vf_agenda_mode_cache') || 'null');
+    if (cached && cached.ts && Date.now() - cached.ts < 5 * 60 * 1000) return cached.mode;
+    const r = await fetch(`${PANEL_BASE}/api/config/agenda-mode`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const d = r.ok ? await r.json() : {};
+    const mode = d.agendaMode || 'google';
+    localStorage.setItem('vf_agenda_mode_cache', JSON.stringify({ mode, ts: Date.now() }));
+    return mode;
+  } catch { return 'google'; }
+}
+
 async function loadServerCalendarEvents(token) {
   const PANEL_BASE = WEBHOOK_URL.replace('/api/medicao', '');
   const container = document.getElementById('calendar-events');
   if (!container) return;
   container.innerHTML = '<div style="text-align:center;padding:12px;color:#888;font-size: 16px;">Carregando agendamentos...</div>';
   document.getElementById('calendar-section').style.display = 'block';
+
   try {
-    const r = await fetch(`${PANEL_BASE}/api/calendar/events`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    if (!r.ok) { container.innerHTML = ''; document.getElementById('calendar-section').style.display = 'none'; return; }
-    const events = await r.json();
+    // O modo controla SE busca o Google Calendar. Visitas Vedafacil aparecem SEMPRE
+    // (porque o operador as criou explicitamente para este medidor pelo painel).
+    const agendaMode = await getAgendaMode(token);
+
+    // Visitas Vedafacil — busca sempre (paralelo com Google)
+    const visitasPromise = loadVisitasVedafacil(token);
+
+    // Google Calendar — só busca se o modo permitir
+    const googlePromise = (agendaMode === 'proprio')
+      ? Promise.resolve([])
+      : fetch(`${PANEL_BASE}/api/calendar/events`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        }).then(r => r.ok ? r.json() : []).catch(() => []);
+
+    const [googleResp, vedafacilEvents] = await Promise.all([googlePromise, visitasPromise]);
+    const googleEvents = Array.isArray(googleResp) ? googleResp : (googleResp.events || []);
+    const googleComFonte = googleEvents.map(e => ({ ...e, fonte: 'google' }));
+    const events = [...googleComFonte, ...vedafacilEvents]
+      .sort((a, b) => (a.start || '').localeCompare(b.start || ''));
+
+    window._agendaMode = agendaMode;
     renderCalendarEventsFromServer(events, container);
   } catch (err) {
     container.innerHTML = '';
@@ -1289,17 +1950,39 @@ function renderCalendarEventsFiltered() {
       ? `<button disabled style="flex:2;min-width:90px;padding:7px 4px;background:#a5d6a7;color:#1b5e20;border:none;border-radius:8px;font-size: 15px;font-weight:600;cursor:default;opacity:0.7;">✅ Concluído</button>`
       : `<button onclick="startFromCalendarEvent(${realIdx})" style="flex:2;min-width:90px;padding:7px 4px;background:#e87722;color:white;border:none;border-radius:8px;font-size: 15px;font-weight:600;cursor:pointer;">📐 Medição</button>`;
 
+    // Tags extras pra visitas Vedafacil:
+    //   - "🏢 Escritório" se criada pelo escritório
+    //   - "👤 [Nome do colega]" se for visita de outro medidor (não própria)
+    let tagsExtras = '';
+    if (ev.fonte === 'vedafacil') {
+      if (ev.criadorEhEscritorio) {
+        tagsExtras += `<span style="display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:10px;margin-top:2px;margin-left:4px;background:#fef3c7;color:#92400e;">🏢 Escritório</span>`;
+      }
+      if (ev.propria === false && ev.medidorNome) {
+        tagsExtras += `<span style="display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:10px;margin-top:2px;margin-left:4px;background:#ede9fe;color:#6d28d9;">👤 ${escHtml(ev.medidorNome)}</span>`;
+      }
+    }
+
+    // Botão "Editar" — só pra Vedafacil + medidor com permissão de agendar.
+    // Se podeEditar=false (escritório), o clique mostra alerta em vez de abrir form.
+    const btnEditar = (ev.fonte === 'vedafacil' && window.MEDIDOR_INFO?.podeAgendar)
+      ? `<button onclick="tentarEditarVisita(${realIdx})" style="flex:1;min-width:70px;padding:7px 4px;background:#f3f4f6;color:#374151;border:1px solid #d1d5db;border-radius:8px;font-size:14px;font-weight:600;text-align:center;cursor:pointer;">✏️ Editar</button>`
+      : '';
+
     return `<div class="calendar-event-card" style="${cardStyle}">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
         <div class="calendar-event-title" style="${titleStyle}">${escHtml(ev.title || '(sem título)')}</div>
         ${badge}
       </div>
       ${timeStr ? `<div class="calendar-event-time" style="${timeStyle}">📅 ${timeStr}</div>` : ''}
+      ${ev.fonte ? `<div style="display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:10px;margin-top:2px;${ev.fonte === 'vedafacil' ? 'background:#dbeafe;color:#1d4ed8;' : 'background:#f3f4f6;color:#6b7280;'}">${ev.fonte === 'vedafacil' ? '📋 Vedafacil' : '📅 Google'}</div>${tagsExtras}` : ''}
       ${ev.location ? `<div class="calendar-event-location">📍 ${escHtml(ev.location)}</div>` : ''}
       ${ev.description ? `<div style="font-size: 18px;color:#555;margin-top:6px;line-height:1.45;white-space:pre-line;background:#f9f9f9;border-radius:8px;padding:8px 10px;border-left:3px solid #e87722;">${escHtml(ev.description)}</div>` : ''}
+      ${(ev.fotosCliente && ev.fotosCliente.length > 0) ? `<button onclick="abrirFotosCliente(${realIdx})" style="margin-top:8px;width:100%;padding:9px;background:#dbeafe;color:#1d4ed8;border:1px solid #93c5fd;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;text-align:center;">📷 Fotos do cliente (${ev.fotosCliente.length})</button>` : ''}
       <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;">
         ${googleMapsUrl ? `<a href="${googleMapsUrl}" target="_blank" style="flex:1;min-width:70px;padding:7px 4px;background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7;border-radius:8px;font-size:15px;font-weight:600;text-align:center;text-decoration:none;">🗺️ Maps</a>` : ''}
         ${wazeAppUrl ? `<button onclick="abrirWaze('${wazeAppUrl}','${wazeWebUrl}')" style="flex:1;min-width:70px;padding:7px 4px;background:#e8f0fe;color:#1a4fd6;border:1px solid #c5cef9;border-radius:8px;font-size:15px;font-weight:600;text-align:center;cursor:pointer;">🔵 Waze</button>` : ''}
+        ${btnEditar}
         ${btnMedicao}
       </div>
     </div>`;
@@ -1390,6 +2073,12 @@ function showHome() {
     }
   } catch(e) {}
 
+  // Verifica se há rascunho automático esperando ser retomado
+  // (rodando depois pra não bloquear o render)
+  setTimeout(() => {
+    try { checkAutosave() } catch {}
+  }, 300);
+
   document.getElementById('home-greeting').textContent = `Olá, ${currentUser}`;
   document.getElementById('home-date').textContent = formatDateFull(Date.now());
   updateOnlineBadge();
@@ -1400,6 +2089,8 @@ function showHome() {
     if (calBtn) calBtn.style.display = 'none';
     document.getElementById('calendar-section').style.display = 'block';
     loadServerCalendarEvents(stored.googleToken);
+    // Carrega permissões de agendamento → mostra/esconde botão "FAZER AGENDAMENTO"
+    carregarPermissoesAgendamento(stored.googleToken);
   } else {
     if (calBtn) calBtn.style.display = 'none'; // hide old OAuth button
     document.getElementById('calendar-section').style.display = 'none';
@@ -1410,7 +2101,7 @@ function showHome() {
 
 function renderHome() {
   const all = getMeasurements();
-  const pending = all.filter(m => m.status === 'draft' || m.status === 'pending' || m.status === 'reaberta');
+  const pending = all.filter(m => m.status === 'draft' || m.status === 'pending' || m.status === 'reaberta' || m.status === 'incompleto');
   const todayStart = new Date(); todayStart.setHours(0,0,0,0);
   const sent = all.filter(m => m.status === 'sent' && m.createdAt >= todayStart.getTime());
 
@@ -1437,22 +2128,29 @@ function renderHome() {
 }
 
 function renderMeasurementCard(m) {
-  const statusLabels = { draft: 'Rascunho', pending: 'Aguardando envio', sent: 'Enviada', reaberta: 'Reaberta' };
-  const statusClass = { draft: 'status-draft', pending: 'status-pending', sent: 'status-sent', reaberta: 'status-pending' };
+  const statusLabels = { draft: 'Rascunho', pending: 'Aguardando envio', sent: 'Enviada', reaberta: 'Reaberta', incompleto: 'Pendente de envio' };
+  const statusClass = { draft: 'status-draft', pending: 'status-pending', sent: 'status-sent', reaberta: 'status-pending', incompleto: 'status-pending' };
+  // Incompletos não podem ser enviados ainda — primeiro precisa completar
   const canSend = m.status === 'pending' || m.status === 'draft' || m.status === 'reaberta';
   const sendLabel = m.status === 'reaberta' ? 'Reenviar (PUT)' : 'Enviar agora';
   const canEdit = m.status !== 'sent';
   const canReopen = m.status === 'sent';
+  const isIncompleto = m.status === 'incompleto' || m.incompleto;
   return `
-    <div class="measurement-card">
+    <div class="measurement-card${isIncompleto ? ' card-incompleto' : ''}">
       <div class="card-header">
         <div class="card-client">${escHtml(m.cliente || 'Sem cliente')}</div>
         <span class="status-badge ${statusClass[m.status] || 'status-draft'}">${statusLabels[m.status] || m.status}</span>
       </div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;margin:4px 0 0">
+        ${isIncompleto ? '<span style="background:#fff7ed;color:#c2410c;border:1px solid #fdba74;border-radius:999px;padding:2px 10px;font-size:11px;font-weight:800;letter-spacing:0.4px">📝 INCOMPLETO</span>' : ''}
+        ${(isIncompleto || m.status === 'draft') ? '<span style="background:#f1f5f9;color:#475569;border:1px solid #cbd5e1;border-radius:999px;padding:2px 10px;font-size:11px;font-weight:800;letter-spacing:0.4px">RASCUNHO</span>' : ''}
+      </div>
       <div class="card-city">${escHtml(m.cidade || '')} · ${formatDate(m.createdAt)}</div>
       <div class="card-actions">
+        ${isIncompleto ? `<button class="btn-sm btn-edit" onclick="editMeasurement('${m.id}')">▶ Continuar</button>` : ''}
         ${canSend ? `<button class="btn-sm btn-send" onclick="sendNow('${m.id}')">${sendLabel}</button>` : ''}
-        ${canEdit ? `<button class="btn-sm btn-edit" onclick="editMeasurement('${m.id}')">Editar</button>` : ''}
+        ${canEdit && !isIncompleto ? `<button class="btn-sm btn-edit" onclick="editMeasurement('${m.id}')">Editar</button>` : ''}
         ${canEdit ? `<button class="btn-sm" style="background:#ede9fe;color:#5b21b6;border:1px solid #c4b5fd;border-radius:6px;padding:6px 12px;font-size: 16px;cursor:pointer;" onclick="editarFotosMedicao('${m.id}')">📷 Fotos</button>` : ''}
         ${canReopen ? `<button class="btn-sm" style="background:#fff3e0;color:#e65100;border:1px solid #ffcc80;border-radius:6px;padding:6px 12px;font-size: 16px;cursor:pointer;" onclick="reabrirMedicao('${m.id}')">Reabrir</button>` : ''}
         <button class="btn-sm btn-delete" onclick="confirmDelete('${m.id}')">Excluir</button>
@@ -1555,6 +2253,7 @@ async function sendMeasurement(measurement, onAttempt) {
     andaimeRodinhas: measurement.andaimeRodinhas || false,
     andaimeBases: measurement.andaimeBases || false,
     andaimeLargura: measurement.andaimeLargura || '1m',
+    visitaId: measurement.visitaId || null, // amarra a medição à visita Vedafacil que originou
     locais: locaisComprimidos
   };
 
@@ -1692,7 +2391,9 @@ function editMeasurement(id) {
   const m = getMeasurements().find(x => x.id === id);
   if (!m) return;
   currentMeasurement = JSON.parse(JSON.stringify(m)); // deep copy
-  openForm(1);
+  // Se for incompleto (autosave), retoma na etapa em que parou
+  const stepInicial = (m.status === 'incompleto' && m._autosaveStep) ? m._autosaveStep : 1;
+  openForm(Math.max(1, Math.min(3, stepInicial)));
 }
 
 // Abre direto na etapa de fotos (step 2) para edição rápida de fotos
@@ -1706,6 +2407,16 @@ function editarFotosMedicao(id) {
 function openForm(step) {
   currentStep = step;
   sessionStorage.setItem('vf_current_measurement', JSON.stringify(currentMeasurement));
+  // Liga autosave em qualquer input/change/click dentro da tela do formulário (uma vez só)
+  const fmEl = document.getElementById('screen-form');
+  if (fmEl && !fmEl.dataset.autosaveBound) {
+    ['input', 'change', 'click'].forEach(evt => {
+      fmEl.addEventListener(evt, () => scheduleAutosave(), true);
+    });
+    fmEl.dataset.autosaveBound = '1';
+  }
+  // Auto-save imediato ao abrir o formulário
+  scheduleAutosave();
   // Reset step 1 fields
   document.getElementById('f-cliente').value = currentMeasurement.cliente || '';
   document.getElementById('f-endereco').value = currentMeasurement.endereco || '';
@@ -1741,6 +2452,8 @@ function openForm(step) {
 // ══════════════════════════════════════════════
 function goToStep(n) {
   currentStep = n;
+  // Auto-save ao trocar de step (garante que a transição grava o estado)
+  scheduleAutosave();
   document.querySelectorAll('.form-step').forEach((el, i) => {
     el.classList.toggle('active', i + 1 === n);
   });
@@ -1765,7 +2478,14 @@ function goToStep(n) {
     nb.className = 'btn-next'; nb.textContent = 'Próximo →'; nb.onclick = goNext;
     footer.appendChild(nb);
   } else {
-    // Step 3: apenas CONCLUIR (Voltar já adicionado pelo bloco n>1 acima)
+    // Step 3: SALVAR RASCUNHO + CONCLUIR (Voltar já adicionado pelo bloco n>1 acima)
+    const sb = document.createElement('button');
+    sb.className = 'btn-back';
+    sb.style.cssText += ';background:#f1f5f9;color:#475569;border:1px solid #cbd5e1;';
+    sb.textContent = '💾 Salvar Rascunho';
+    sb.onclick = saveDraft;
+    footer.appendChild(sb);
+
     const cb = document.createElement('button');
     cb.className = 'btn-concluir'; cb.textContent = '✓ CONCLUIR'; cb.onclick = concluir;
     footer.appendChild(cb);
@@ -2431,11 +3151,59 @@ function showSuccessScreen(m) {
 }
 
 function saveDraft() {
-  collectLocations();
+  // Coleta TODOS os campos (mesmo se estiver na Etapa 1 ou 2)
+  try { collectCurrentStep() } catch {}
+  try { collectLocations() } catch {}
   currentMeasurement.status = 'draft';
   upsertMeasurement(currentMeasurement);
-  showToast('Rascunho salvo!', 'success');
+  // Limpa rascunho automático já que agora foi salvo explicitamente
+  localStorage.removeItem('vf_autosave');
+  showToast('💾 Rascunho salvo!', 'success');
   showHome();
+}
+
+// ── AUTOSAVE: salva na lista de medições com status 'incompleto'
+// Aparece na home como pendente, com tag INCOMPLETO + RASCUNHO.
+// Se o usuário sair do app/atender ligação, basta clicar no card pra continuar.
+let _autosaveTimer = null;
+function scheduleAutosave() {
+  if (_autosaveTimer) clearTimeout(_autosaveTimer);
+  _autosaveTimer = setTimeout(() => {
+    if (!currentMeasurement || !currentMeasurement.id) return;
+    // Não salva se a medição não tem nem nome do cliente (vazia)
+    if (!currentMeasurement.cliente && (!currentMeasurement.locais || currentMeasurement.locais.length === 0)) return;
+    try {
+      try { collectCurrentStep() } catch {}
+      try { collectLocations() } catch {}
+      const arr = getMeasurements();
+      const idx = arr.findIndex(m => m.id === currentMeasurement.id);
+      const existing = idx >= 0 ? arr[idx] : null;
+      // Se a medição já foi enviada, não sobrescreve
+      if (existing && existing.status === 'sent') return;
+      // Mantém status 'draft' se o usuário já tinha salvo manualmente; senão marca como incompleto
+      const novoStatus = (existing && existing.status === 'draft') ? 'draft' : 'incompleto';
+      const snapshot = {
+        ...currentMeasurement,
+        status: novoStatus,
+        incompleto: novoStatus === 'incompleto',
+        _autosaveTs: Date.now(),
+        _autosaveStep: currentStep || 1,
+        updatedAt: Date.now(),
+      };
+      if (idx >= 0) arr[idx] = snapshot; else arr.unshift(snapshot);
+      saveMeasurements(arr);
+      // Também guarda em chave separada (compat com checkAutosave)
+      localStorage.setItem('vf_autosave', JSON.stringify(snapshot));
+      // Atualiza a UI da home (caso esteja visível em outra aba/tab)
+      try { renderHome() } catch {}
+    } catch (e) { /* silencioso */ }
+  }, 1500);
+}
+
+// Função antiga checkAutosave — não usa mais popup, deixa o usuário clicar no card.
+// Mantida só pra limpar a chave antiga se existir.
+function checkAutosave() {
+  localStorage.removeItem('vf_autosave_legacy');
 }
 
 function concluir() {
@@ -2463,6 +3231,8 @@ function concluir() {
   currentMeasurement.garantia = garantiaInput ? garantiaInput.value : '15';
   currentMeasurement.status = 'draft';
   upsertMeasurement(currentMeasurement);
+  // Autosave persistiu no draft oficial — pode descartar
+  localStorage.removeItem('vf_autosave');
   showToast('Medição salva! Use "Enviar agora" para enviar.', 'success');
   showHome();
 }
@@ -2493,6 +3263,8 @@ async function submitMeasurement() {
       currentMeasurement.status = 'sent';
       upsertMeasurement(currentMeasurement);
       markCalendarEventDone(currentMeasurement.calendarEventId);
+      // Autosave foi consumido — pode descartar
+      localStorage.removeItem('vf_autosave');
       showSuccessScreen(currentMeasurement);
     } else {
       currentMeasurement.status = 'pending';
@@ -2580,19 +3352,54 @@ async function loadCalendarEvents() {
   }
 }
 
+// Abre overlay com as fotos do cliente (anexadas pelo operador no painel)
+function abrirFotosCliente(idx) {
+  const ev = window._calendarEvents && window._calendarEvents[idx];
+  if (!ev || !Array.isArray(ev.fotosCliente) || ev.fotosCliente.length === 0) return;
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:10000;overflow-y:auto;padding:16px;';
+  const fotosHtml = ev.fotosCliente.map((src, i) => `
+    <div style="margin-bottom:10px;background:white;border-radius:8px;overflow:hidden;cursor:zoom-in" onclick="(function(s){const v=document.createElement('div');v.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:10001;display:flex;align-items:center;justify-content:center;padding:20px;cursor:zoom-out';v.onclick=()=>v.remove();v.innerHTML='<img src=\\''+s+'\\' style=\\'max-width:100%;max-height:100%;object-fit:contain\\'/>';document.body.appendChild(v);})(${JSON.stringify(src)})">
+      <img src="${src}" style="width:100%;display:block" alt="Foto ${i+1}" />
+    </div>
+  `).join('');
+  overlay.innerHTML = `
+    <div style="max-width:600px;margin:0 auto;">
+      <div style="display:flex;align-items:center;justify-content:space-between;color:white;margin-bottom:14px;padding:0 4px;">
+        <div style="font-size:18px;font-weight:800">📷 Fotos do cliente (${ev.fotosCliente.length})</div>
+        <button onclick="this.closest('[data-fotos-cliente]').remove()" style="background:rgba(255,255,255,0.2);border:none;color:white;border-radius:50%;width:36px;height:36px;font-size:20px;cursor:pointer">×</button>
+      </div>
+      ${fotosHtml}
+      <button onclick="this.closest('[data-fotos-cliente]').remove()" style="width:100%;margin-top:10px;padding:12px;background:#e87722;color:white;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer">Fechar</button>
+    </div>
+  `;
+  overlay.setAttribute('data-fotos-cliente', '1');
+  document.body.appendChild(overlay);
+}
+
 function startFromCalendarEvent(idx) {
   const ev = window._calendarEvents && window._calendarEvents[idx];
   if (!ev) { startNewMeasurement(); return; }
-  // Guarda o ID do evento para marcar como concluído após envio
 
   currentMeasurement = makeEmptyMeasurement();
   if (ev.id) currentMeasurement.calendarEventId = ev.id;
-  // ev.title from server (mapped from summary), ev.description for AC/phone
+  if (ev.visitaId) currentMeasurement.visitaId = ev.visitaId;
   currentMeasurement.cliente = ev.title || ev.summary || '';
-  if (ev.location) {
+
+  // Se for visita Vedafacil, usa os campos estruturados (mais confiáveis)
+  if (ev.fonte === 'vedafacil') {
+    currentMeasurement.cep      = ev.cep      || '';
+    currentMeasurement.endereco = ev.endereco || '';
+    currentMeasurement.bairro   = ev.bairro   || '';
+    // O form usa "Cidade - UF" no campo cidade
+    currentMeasurement.cidade   = ev.cidade ? (ev.cidade + (ev.estado ? ' - ' + ev.estado : '')) : '';
+    currentMeasurement.ac       = ev.nomeResponsavel || '';
+    currentMeasurement.celular  = ev.telefone || '';
+    currentMeasurement.obs      = ev.observacao || '';
+  } else if (ev.location) {
+    // Google Calendar — parser por string (fallback)
     const cepMatch = ev.location.match(/\d{5}-\d{3}/);
     if (cepMatch) currentMeasurement.cep = cepMatch[0];
-    // Strip CEP, country suffix, then parse street + city
     let addr = ev.location
       .replace(/,?\s*\d{5}-\d{3}/, '')
       .replace(/,?\s*Brasi[l]?[ia]?[^\s,]*/i, '')
@@ -2600,15 +3407,14 @@ function startFromCalendarEvent(idx) {
       .trim().replace(/,$/, '').trim();
     const parts = addr.split(',');
     currentMeasurement.endereco = parts.slice(0, 2).join(',').trim();
-    // Last part may be "Cidade - UF" — strip state abbreviation
     const cidadePart = (parts[parts.length - 1] || '').trim().replace(/\s*[-–]\s*[A-Z]{2}$/, '').trim();
     currentMeasurement.cidade = cidadePart;
+    const desc = ev.description || '';
+    const acMatch = desc.match(/AC[:\s]+([^\n]+)/i);
+    const telMatch = desc.match(/(?:cel|tel|fone|celular|telefone)[:\s]+([0-9\s()\-+]+)/i);
+    if (acMatch) currentMeasurement.ac = acMatch[1].trim();
+    if (telMatch) currentMeasurement.celular = telMatch[1].trim();
   }
-  const desc = ev.description || '';
-  const acMatch = desc.match(/AC[:\s]+([^\n]+)/i);
-  const telMatch = desc.match(/(?:cel|tel|fone|celular|telefone)[:\s]+([0-9\s()\-+]+)/i);
-  if (acMatch) currentMeasurement.ac = acMatch[1].trim();
-  if (telMatch) currentMeasurement.celular = telMatch[1].trim();
   openForm(1);
   showToast('Formulário pré-preenchido com dados da agenda!', 'success');
 }
@@ -2649,6 +3455,13 @@ if ('serviceWorker' in navigator) {
 // INIT
 // ══════════════════════════════════════════════
 window.addEventListener('DOMContentLoaded', () => {
+  // ── Modo MASTER (admin visualiza como medidor) ─────────────────────────────
+  // Acesso via ?master na URL — abre a tela de master-login do medidor
+  if (location.search.includes('master')) {
+    abrirTelaMasterMedidor();
+    return;
+  }
+
   // Check for Google token returned from OAuth redirect
   const hash = window.location.hash;
   if (hash && hash.includes('google_token=')) {
