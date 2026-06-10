@@ -1802,6 +1802,7 @@ function _gestaoRenderInjetores() {
   if (!equipes.length) return '<div style="text-align:center;color:#888;padding:24px;">Nenhuma equipe.</div>';
   return equipes.map(eq => {
     const i = eq.injetores || {};
+    const divergente = Math.abs(i.discrepancia || 0) > 0;
     const lancHtml = (eq.lancamentosInjetores || []).slice(0, 4).map(l => `
       <div class="gestao-lancamento">
         <span>${new Date(l.ts).toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' })}</span>
@@ -1811,10 +1812,16 @@ function _gestaoRenderInjetores() {
       </div>`).join('');
     return `
     <div class="gestao-card">
-      <div class="gestao-eq-nome">${eq.equipeNome}</div>
-      <div class="gestao-stat" style="background:#fef3c7;">
-        <div class="gestao-stat-val" style="color:#92400e;">${_gestaoFmtInt(i.forneceu)} unid</div>
-        <div class="gestao-stat-lbl" style="color:#92400e;">Você forneceu de injetores</div>
+      <div class="gestao-eq-nome">${eq.equipeNome}${divergente ? ` <span style="background:#fee2e2;color:#b91c1c;font-size:10px;font-weight:700;padding:2px 6px;border-radius:8px;margin-left:6px;">⚠️ ${i.discrepancia > 0 ? '+' : ''}${_gestaoFmtInt(i.discrepancia)} divergente</span>` : ''}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;">
+        <div class="gestao-stat" style="background:#fef3c7;">
+          <div class="gestao-stat-val" style="color:#92400e;">${_gestaoFmtInt(i.forneceu)}</div>
+          <div class="gestao-stat-lbl" style="color:#92400e;">Você forneceu</div>
+        </div>
+        <div class="gestao-stat" style="background:${divergente ? '#fee2e2' : '#dbeafe'};">
+          <div class="gestao-stat-val" style="color:${divergente ? '#b91c1c' : '#1e40af'};">${_gestaoFmtInt(i.equipeDeclarou)}</div>
+          <div class="gestao-stat-lbl" style="color:${divergente ? '#b91c1c' : '#1e40af'};">Equipe declarou</div>
+        </div>
       </div>
       <button class="gestao-add-btn" onclick="_gestaoLancarFornec('${eq.equipeId}','${eq.equipeNome.replace(/'/g,"&apos;")}','injetores')">+ Lançar entrega de injetores</button>
       ${lancHtml ? `<div style="margin-top:8px;"><div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:4px;">Últimos lançamentos</div>${lancHtml}</div>` : ''}
@@ -1850,8 +1857,24 @@ function _gestaoRenderPrevisao() {
 function _gestaoRenderAgenda() {
   const equipes = (_gestaoState.agenda?.equipes || []);
   if (!equipes.length) return '<div style="text-align:center;color:#888;padding:24px;">Sem dados.</div>';
-  return equipes.map(eq => {
+
+  // Filtro por equipe (state)
+  const filtro = _gestaoState.agendaFiltroEquipe || 'todas';
+  const chips = `
+    <div style="display:flex;gap:6px;overflow-x:auto;padding:0 4px 8px;margin-bottom:8px;">
+      <button onclick="_gestaoFiltrarAgenda('todas')" style="padding:6px 12px;border:1px solid ${filtro==='todas'?'#e87722':'#d1d5db'};background:${filtro==='todas'?'#e87722':'#fff'};color:${filtro==='todas'?'#fff':'#374151'};border-radius:14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">Todas</button>
+      ${equipes.map(eq => `<button onclick="_gestaoFiltrarAgenda('${eq.equipeId}')" style="padding:6px 12px;border:1px solid ${filtro===eq.equipeId?'#e87722':'#d1d5db'};background:${filtro===eq.equipeId?'#e87722':'#fff'};color:${filtro===eq.equipeId?'#fff':'#374151'};border-radius:14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">${eq.equipeNome}</button>`).join('')}
+    </div>`;
+
+  const filtradas = filtro === 'todas' ? equipes : equipes.filter(eq => eq.equipeId === filtro);
+
+  const cardsHtml = filtradas.map(eq => {
     if (!eq.oses?.length) return `<div class="gestao-card"><div class="gestao-eq-nome">${eq.equipeNome}</div><div style="color:#9ca3af;font-style:italic;">Sem OS nesta semana</div></div>`;
+
+    // Total agregado por equipe — soma o consumoProduto de todas OSes da semana
+    const totalEstimado = eq.oses.reduce((s, os) => s + (os.consumoProduto || 0), 0);
+    const totalInjetores = eq.oses.reduce((s, os) => s + (os.qtdInjetores || 0), 0);
+
     const osesHtml = eq.oses.map(os => `
       <div class="gestao-os-card" style="border-left-color:${eq.cor || '#888'};">
         <div style="font-weight:700;font-size:14px;color:#1f2937;">#${String(os.numero||'?').padStart(3,'0')} ${os.cliente || '—'}</div>
@@ -1861,8 +1884,24 @@ function _gestaoRenderAgenda() {
           ${os.consumoProduto ? `<span>📦 ${_gestaoFmt(os.consumoProduto)} L estimados</span>` : ''}
         </div>
       </div>`).join('');
-    return `<div class="gestao-card"><div class="gestao-eq-nome" style="color:${eq.cor || '#1f2937'};">${eq.equipeNome}</div>${osesHtml}</div>`;
+
+    return `<div class="gestao-card">
+      <div class="gestao-eq-nome" style="color:${eq.cor || '#1f2937'};">${eq.equipeNome}</div>
+      <div style="background:#fef3c7;border:1px solid #fbbf24;border-radius:10px;padding:10px 12px;margin-bottom:10px;display:flex;gap:14px;flex-wrap:wrap;">
+        <div><div style="font-size:11px;color:#92400e;font-weight:600;">PRODUTO ESTIMADO</div><div style="font-size:18px;font-weight:800;color:#b45309;">${_gestaoFmt(totalEstimado)} L</div></div>
+        ${totalInjetores ? `<div><div style="font-size:11px;color:#92400e;font-weight:600;">INJETORES</div><div style="font-size:18px;font-weight:800;color:#b45309;">${totalInjetores}</div></div>` : ''}
+        <div><div style="font-size:11px;color:#92400e;font-weight:600;">OBRAS</div><div style="font-size:18px;font-weight:800;color:#b45309;">${eq.oses.length}</div></div>
+      </div>
+      ${osesHtml}
+    </div>`;
   }).join('');
+
+  return chips + cardsHtml;
+}
+
+function _gestaoFiltrarAgenda(equipeId) {
+  _gestaoState.agendaFiltroEquipe = equipeId;
+  _gestaoRenderTab();
 }
 
 async function _gestaoLancarFornec(equipeId, equipeNome, tipo) {
@@ -2149,34 +2188,17 @@ async function getAgendaMode(token) {
 }
 
 async function loadServerCalendarEvents(token) {
-  const PANEL_BASE = WEBHOOK_URL.replace('/api/medicao', '');
   const container = document.getElementById('calendar-events');
   if (!container) return;
   container.innerHTML = '<div style="text-align:center;padding:12px;color:#888;font-size: 16px;">Carregando agendamentos...</div>';
   document.getElementById('calendar-section').style.display = 'block';
 
   try {
-    // O modo controla SE busca o Google Calendar. Visitas Vedafacil aparecem SEMPRE
-    // (porque o operador as criou explicitamente para este medidor pelo painel).
-    const agendaMode = await getAgendaMode(token);
-
-    // Visitas Vedafacil — busca sempre (paralelo com Google)
-    const visitasPromise = loadVisitasVedafacil(token);
-
-    // Google Calendar — só busca se o modo permitir
-    const googlePromise = (agendaMode === 'proprio')
-      ? Promise.resolve([])
-      : fetch(`${PANEL_BASE}/api/calendar/events`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        }).then(r => r.ok ? r.json() : []).catch(() => []);
-
-    const [googleResp, vedafacilEvents] = await Promise.all([googlePromise, visitasPromise]);
-    const googleEvents = Array.isArray(googleResp) ? googleResp : (googleResp.events || []);
-    const googleComFonte = googleEvents.map(e => ({ ...e, fonte: 'google' }));
-    const events = [...googleComFonte, ...vedafacilEvents]
-      .sort((a, b) => (a.start || '').localeCompare(b.start || ''));
-
-    window._agendaMode = agendaMode;
+    // Agora a agenda é 100% Vedafacil. O Google Calendar foi desconectado —
+    // os compromissos vêm exclusivamente das Visitas criadas pelos operadores no painel.
+    const vedafacilEvents = await loadVisitasVedafacil(token);
+    const events = vedafacilEvents.sort((a, b) => (a.start || '').localeCompare(b.start || ''));
+    window._agendaMode = 'proprio';
     renderCalendarEventsFromServer(events, container);
   } catch (err) {
     container.innerHTML = '';
@@ -2278,7 +2300,7 @@ function renderCalendarEventsFiltered() {
         ${badge}
       </div>
       ${timeStr ? `<div class="calendar-event-time" style="${timeStyle}">📅 ${timeStr}</div>` : ''}
-      ${ev.fonte ? `<div style="display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:10px;margin-top:2px;${ev.fonte === 'vedafacil' ? 'background:#dbeafe;color:#1d4ed8;' : 'background:#f3f4f6;color:#6b7280;'}">${ev.fonte === 'vedafacil' ? '📋 Vedafacil' : '📅 Google'}</div>${tagsExtras}` : ''}
+      ${tagsExtras}
       ${ev.location ? `<div class="calendar-event-location">📍 ${escHtml(ev.location)}</div>` : ''}
       ${ev.description ? `<div style="font-size: 18px;color:#555;margin-top:6px;line-height:1.45;white-space:pre-line;background:#f9f9f9;border-radius:8px;padding:8px 10px;border-left:3px solid #e87722;">${escHtml(ev.description)}</div>` : ''}
       ${(ev.fotosCliente && ev.fotosCliente.length > 0) ? `<button onclick="abrirFotosCliente(${realIdx})" style="margin-top:8px;width:100%;padding:9px;background:#dbeafe;color:#1d4ed8;border:1px solid #93c5fd;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;text-align:center;">📷 Fotos do cliente (${ev.fotosCliente.length})</button>` : ''}
