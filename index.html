@@ -831,6 +831,25 @@
 <body>
 
 <!-- ══════════════════════════════════════════════
+     SCREEN: DEVOCIONAL (versículo do dia — primeira abertura do dia)
+══════════════════════════════════════════════ -->
+<div id="screen-devocional" style="display:none;position:fixed;inset:0;z-index:99999;background:linear-gradient(135deg,#c45d12 0%,#e87722 50%,#f59340 100%);color:white;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center;overflow-y:auto;">
+  <div style="max-width:520px;width:100%;animation:dvFadeIn 0.6s ease;">
+    <div style="font-size:48px;margin-bottom:24px;opacity:0.85;">✝️</div>
+    <div style="font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;opacity:0.85;margin-bottom:24px;">Palavra do dia</div>
+    <div id="devocional-texto" style="font-size:22px;line-height:1.45;font-weight:500;margin-bottom:24px;text-shadow:0 1px 3px rgba(0,0,0,0.15);">…</div>
+    <div id="devocional-ref" style="font-size:15px;font-weight:700;opacity:0.92;margin-bottom:48px;">…</div>
+    <button id="devocional-btn-amem" onclick="fecharDevocional()" style="background:white;color:#c45d12;border:none;border-radius:999px;padding:16px 56px;font-size:20px;font-weight:800;letter-spacing:1.5px;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,0.25);transition:transform 0.15s;">
+      🙏 AMÉM
+    </button>
+  </div>
+</div>
+<style>
+@keyframes dvFadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+#devocional-btn-amem:active { transform: scale(0.96); }
+</style>
+
+<!-- ══════════════════════════════════════════════
      SCREEN 1: LOGIN
 ══════════════════════════════════════════════ -->
 <div id="screen-login" class="screen">
@@ -939,6 +958,14 @@
       onclick="abrirNovaVisita()"
       style="display:none;width:100%;padding:14px;margin-top:10px;background:linear-gradient(135deg,#0ea5e9,#0284c7);color:white;border:none;border-radius:var(--radius);font-size:17px;font-weight:700;letter-spacing:0.3px;cursor:pointer;box-shadow:0 4px 12px rgba(2,132,199,0.25);display:flex;align-items:center;justify-content:center;gap:8px;">
       📅 FAZER AGENDAMENTO
+    </button>
+
+    <!-- Botão GESTÃO DE EQUIPES — só aparece pra encarregado (state.podeGerirEquipes) -->
+    <button
+      id="btn-gestao-equipes"
+      onclick="abrirGestaoEquipes()"
+      style="display:none;width:100%;padding:14px;margin-top:10px;background:linear-gradient(135deg,#15803d,#166534);color:white;border:none;border-radius:var(--radius);font-size:17px;font-weight:700;letter-spacing:0.3px;cursor:pointer;box-shadow:0 4px 12px rgba(22,101,52,0.3);display:flex;align-items:center;justify-content:center;gap:8px;">
+      🛠️ GESTÃO DE EQUIPES
     </button>
 
     <div class="section-title">Pendentes de envio</div>
@@ -1064,6 +1091,48 @@
     </button>
   </div>
 </div>
+
+<!-- ══════════════════════════════════════════════
+     SCREEN: GESTÃO DE EQUIPES (encarregado / Edson)
+══════════════════════════════════════════════ -->
+<div id="screen-gestao-equipes" class="screen">
+  <div style="background:linear-gradient(135deg,#15803d,#166534);padding:18px 18px 22px;color:white;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+      <button onclick="showHome()" style="background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.35);color:white;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;" title="Voltar">←</button>
+      <h1 style="font-size:22px;font-weight:800;margin:0;flex:1;">🛠️ Gestão de Equipes</h1>
+    </div>
+    <!-- Navegação de semana -->
+    <div style="display:flex;align-items:center;gap:10px;margin-top:12px;background:rgba(255,255,255,0.12);border-radius:10px;padding:8px 10px;">
+      <button onclick="gestaoMudarSemana(-1)" style="background:rgba(255,255,255,0.2);border:none;color:white;width:32px;height:32px;border-radius:50%;cursor:pointer;font-weight:bold;">‹</button>
+      <div id="gestao-semana-label" style="flex:1;text-align:center;font-size:13px;font-weight:700;">Semana</div>
+      <button onclick="gestaoMudarSemana(1)" style="background:rgba(255,255,255,0.2);border:none;color:white;width:32px;height:32px;border-radius:50%;cursor:pointer;font-weight:bold;">›</button>
+    </div>
+  </div>
+  <!-- Tabs -->
+  <div style="background:white;padding:8px 12px;display:flex;gap:6px;overflow-x:auto;border-bottom:1px solid #e5e7eb;-webkit-overflow-scrolling:touch;">
+    <button class="gestao-tab-btn" data-tab="produtos"  onclick="gestaoTrocarTab('produtos')">📦 Produtos</button>
+    <button class="gestao-tab-btn" data-tab="injetores" onclick="gestaoTrocarTab('injetores')">💉 Injetores</button>
+    <button class="gestao-tab-btn" data-tab="previsao"  onclick="gestaoTrocarTab('previsao')">🔮 Previsão</button>
+    <button class="gestao-tab-btn" data-tab="agenda"    onclick="gestaoTrocarTab('agenda')">📅 Agenda</button>
+  </div>
+  <div id="gestao-content" style="padding:14px;background:var(--gray-100);min-height:calc(100vh - 200px);">
+    <div style="text-align:center;padding:24px;color:#888;">Carregando…</div>
+  </div>
+</div>
+<style>
+.gestao-tab-btn { background:#f3f4f6;color:#374151;border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0; }
+.gestao-tab-btn.active { background:#15803d;color:white; }
+.gestao-card { background:white;border-radius:12px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,0.08); }
+.gestao-eq-nome { font-weight:800;font-size:16px;color:#1f2937;margin-bottom:8px; }
+.gestao-stat-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:6px;text-align:center; }
+.gestao-stat { padding:8px 4px;border-radius:8px; }
+.gestao-stat-val { font-weight:800;font-size:15px; }
+.gestao-stat-lbl { font-size:10px;text-transform:uppercase;letter-spacing:0.4px;margin-top:2px; }
+.gestao-divergente { background:#fee2e2;border:1px solid #fca5a5;color:#991b1b;padding:6px 10px;border-radius:8px;font-size:12px;font-weight:600;margin-top:8px;text-align:center; }
+.gestao-add-btn { margin-top:10px;width:100%;padding:10px;background:#dcfce7;color:#166534;border:1px dashed #86efac;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer; }
+.gestao-lancamento { display:flex;justify-content:space-between;align-items:center;font-size:12px;background:#f9fafb;border-radius:6px;padding:6px 10px;margin-top:4px; }
+.gestao-os-card { background:white;border-radius:10px;padding:10px 12px;margin-bottom:6px;border-left:4px solid; }
+</style>
 
 <!-- ══════════════════════════════════════════════
      SCREEN 3-5: FORM (3 steps)
@@ -1569,7 +1638,7 @@ async function loadVisitasVedafacil(token) {
 // ══════════════════════════════════════════════
 // Estado global das permissões de agendamento.
 // Carregado uma vez no boot — define se o botão na home aparece e pra quem pode agendar.
-window.MEDIDOR_INFO = { podeAgendar: false, agendaPara: [], meuEmail: '', meuNome: '' };
+window.MEDIDOR_INFO = { podeAgendar: false, podeGerirEquipes: false, agendaPara: [], meuEmail: '', meuNome: '' };
 // Visita sendo editada (null = criação)
 let _visitaEdit = null;
 
@@ -1583,6 +1652,7 @@ async function carregarPermissoesAgendamento(token) {
     const d = await r.json();
     window.MEDIDOR_INFO = {
       podeAgendar: !!d.podeAgendar,
+      podeGerirEquipes: !!d.podeGerirEquipes,
       agendaPara: Array.isArray(d.agendaPara) ? d.agendaPara : [],
       meuEmail: d.meuEmail || '',
       meuNome: d.meuNome || '',
@@ -1590,9 +1660,242 @@ async function carregarPermissoesAgendamento(token) {
     // Mostra/esconde o botão na home
     const btn = document.getElementById('btn-fazer-agendamento');
     if (btn) btn.style.display = window.MEDIDOR_INFO.podeAgendar ? 'flex' : 'none';
+    const btnG = document.getElementById('btn-gestao-equipes');
+    if (btnG) btnG.style.display = window.MEDIDOR_INFO.podeGerirEquipes ? 'flex' : 'none';
   } catch (e) {
     console.warn('Falha ao carregar permissões de agendamento:', e?.message || e);
   }
+}
+
+// ══════════════════════════════════════════════
+// GESTÃO DE EQUIPES (encarregado)
+// ══════════════════════════════════════════════
+let _gestaoState = { semana: null, tab: 'produtos', data: null, agenda: null, estoque: null };
+
+function _getSemanaIso(d) {
+  // ISO week: YYYY-Www
+  const dt = new Date(d.getTime());
+  dt.setUTCHours(0,0,0,0);
+  dt.setUTCDate(dt.getUTCDate() + 4 - (dt.getUTCDay() || 7));
+  const yearStart = new Date(Date.UTC(dt.getUTCFullYear(), 0, 1));
+  const w = Math.ceil(((dt - yearStart) / 86400000 + 1) / 7);
+  return `${dt.getUTCFullYear()}-W${String(w).padStart(2,'0')}`;
+}
+
+function _semanaIsoDelta(semanaIso, delta) {
+  // semanaIso = 'YYYY-Www' → soma delta semanas
+  const m = /^(\d{4})-W(\d{2})$/.exec(semanaIso);
+  if (!m) return semanaIso;
+  const y = +m[1], w = +m[2];
+  // Segunda da semana ISO w/y
+  const jan4 = new Date(Date.UTC(y, 0, 4));
+  const dow = jan4.getUTCDay() || 7;
+  const seg = new Date(jan4);
+  seg.setUTCDate(jan4.getUTCDate() - dow + 1 + (w - 1) * 7 + delta * 7);
+  return _getSemanaIso(seg);
+}
+
+function abrirGestaoEquipes() {
+  if (!window.MEDIDOR_INFO?.podeGerirEquipes) return;
+  _gestaoState.semana = _getSemanaIso(new Date());
+  _gestaoState.tab = 'produtos';
+  showScreen('gestao-equipes');
+  _gestaoCarregar();
+}
+
+function gestaoMudarSemana(delta) {
+  _gestaoState.semana = _semanaIsoDelta(_gestaoState.semana, delta);
+  _gestaoCarregar();
+}
+
+function gestaoTrocarTab(tab) {
+  _gestaoState.tab = tab;
+  document.querySelectorAll('.gestao-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  _gestaoRenderTab();
+}
+
+function _gestaoFmt(n) { return Number(n||0).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }); }
+function _gestaoFmtInt(n) { return Number(n||0).toLocaleString('pt-BR'); }
+function _semanaLabel(s) {
+  const m = /^(\d{4})-W(\d{2})$/.exec(s);
+  if (!m) return s;
+  const y = +m[1], w = +m[2];
+  const jan4 = new Date(Date.UTC(y, 0, 4));
+  const dow = jan4.getUTCDay() || 7;
+  const seg = new Date(jan4);
+  seg.setUTCDate(jan4.getUTCDate() - dow + 1 + (w - 1) * 7);
+  const sex = new Date(seg); sex.setUTCDate(sex.getUTCDate() + 6);
+  const fmt = (d) => String(d.getUTCDate()).padStart(2,'0') + '/' + String(d.getUTCMonth()+1).padStart(2,'0');
+  return `Semana ${w} · ${fmt(seg)}–${fmt(sex)}`;
+}
+
+async function _gestaoCarregar() {
+  document.getElementById('gestao-semana-label').textContent = _semanaLabel(_gestaoState.semana);
+  document.querySelectorAll('.gestao-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === _gestaoState.tab));
+  const cont = document.getElementById('gestao-content');
+  cont.innerHTML = '<div style="text-align:center;padding:24px;color:#888;">Carregando…</div>';
+  const token = getStoredToken();
+  const PANEL_BASE = WEBHOOK_URL.replace('/api/medicao', '');
+  try {
+    const [dashRes, agendaRes, estoqueRes] = await Promise.all([
+      fetch(`${PANEL_BASE}/api/encarregado/dashboard?semana=${_gestaoState.semana}`, { headers: { Authorization: 'Bearer ' + token } }),
+      fetch(`${PANEL_BASE}/api/encarregado/agenda-equipes?semana=${_gestaoState.semana}`, { headers: { Authorization: 'Bearer ' + token } }),
+      fetch(`${PANEL_BASE}/api/estoque-equipes?semana=${_gestaoState.semana}`, { headers: { Authorization: 'Bearer ' + token } }),
+    ]);
+    _gestaoState.data = dashRes.ok ? await dashRes.json() : { equipes: [] };
+    _gestaoState.agenda = agendaRes.ok ? await agendaRes.json() : { equipes: [] };
+    _gestaoState.estoque = estoqueRes.ok ? await estoqueRes.json() : { equipes: [] };
+    _gestaoRenderTab();
+  } catch (e) {
+    cont.innerHTML = `<div style="color:#b91c1c;padding:20px;text-align:center;">Erro: ${e.message || e}</div>`;
+  }
+}
+
+function _gestaoRenderTab() {
+  const cont = document.getElementById('gestao-content');
+  const tab = _gestaoState.tab;
+  if (tab === 'produtos')  return cont.innerHTML = _gestaoRenderProdutos();
+  if (tab === 'injetores') return cont.innerHTML = _gestaoRenderInjetores();
+  if (tab === 'previsao')  return cont.innerHTML = _gestaoRenderPrevisao();
+  if (tab === 'agenda')    return cont.innerHTML = _gestaoRenderAgenda();
+}
+
+function _gestaoRenderProdutos() {
+  const equipes = (_gestaoState.data?.equipes || []);
+  if (!equipes.length) return '<div style="text-align:center;color:#888;padding:24px;">Nenhuma equipe.</div>';
+  return equipes.map(eq => {
+    const p = eq.produto || {};
+    const divergente = Math.abs(p.discrepancia || 0) > 0.5;
+    const lancHtml = (eq.lancamentosProduto || []).slice(0, 4).map(l => `
+      <div class="gestao-lancamento">
+        <span>${new Date(l.ts).toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' })}</span>
+        <span style="font-weight:700;">${_gestaoFmt(l.quantidade)} L
+          <button onclick="_gestaoExcluirFornec('${l._id}')" style="background:none;border:none;color:#dc2626;cursor:pointer;margin-left:6px;font-size:14px;">×</button>
+        </span>
+      </div>`).join('');
+    return `
+    <div class="gestao-card">
+      <div class="gestao-eq-nome">${eq.equipeNome}</div>
+      <div class="gestao-stat-grid">
+        <div class="gestao-stat" style="background:#dbeafe;">
+          <div class="gestao-stat-val" style="color:#1d4ed8;">${_gestaoFmt(p.forneceu)} L</div>
+          <div class="gestao-stat-lbl" style="color:#1d4ed8;">Você forneceu</div>
+        </div>
+        <div class="gestao-stat" style="background:#f3e8ff;">
+          <div class="gestao-stat-val" style="color:#7e22ce;">${_gestaoFmt(p.equipeDeclarou)} L</div>
+          <div class="gestao-stat-lbl" style="color:#7e22ce;">Equipe declarou</div>
+        </div>
+        <div class="gestao-stat" style="background:#ede9fe;">
+          <div class="gestao-stat-val" style="color:#6d28d9;">${_gestaoFmt(p.saldoAnterior)} L</div>
+          <div class="gestao-stat-lbl" style="color:#6d28d9;">Saldo anterior</div>
+        </div>
+      </div>
+      ${divergente ? `<div class="gestao-divergente">⚠️ ${_gestaoFmt(Math.abs(p.discrepancia))} L de divergência</div>` : ''}
+      <button class="gestao-add-btn" onclick="_gestaoLancarFornec('${eq.equipeId}','${eq.equipeNome.replace(/'/g,"&apos;")}','produto')">+ Lançar entrega de produto</button>
+      ${lancHtml ? `<div style="margin-top:8px;"><div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:4px;">Últimos lançamentos</div>${lancHtml}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function _gestaoRenderInjetores() {
+  const equipes = (_gestaoState.data?.equipes || []);
+  if (!equipes.length) return '<div style="text-align:center;color:#888;padding:24px;">Nenhuma equipe.</div>';
+  return equipes.map(eq => {
+    const i = eq.injetores || {};
+    const lancHtml = (eq.lancamentosInjetores || []).slice(0, 4).map(l => `
+      <div class="gestao-lancamento">
+        <span>${new Date(l.ts).toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' })}</span>
+        <span style="font-weight:700;">${_gestaoFmtInt(l.quantidade)} unid
+          <button onclick="_gestaoExcluirFornec('${l._id}')" style="background:none;border:none;color:#dc2626;cursor:pointer;margin-left:6px;font-size:14px;">×</button>
+        </span>
+      </div>`).join('');
+    return `
+    <div class="gestao-card">
+      <div class="gestao-eq-nome">${eq.equipeNome}</div>
+      <div class="gestao-stat" style="background:#fef3c7;">
+        <div class="gestao-stat-val" style="color:#92400e;">${_gestaoFmtInt(i.forneceu)} unid</div>
+        <div class="gestao-stat-lbl" style="color:#92400e;">Você forneceu de injetores</div>
+      </div>
+      <button class="gestao-add-btn" onclick="_gestaoLancarFornec('${eq.equipeId}','${eq.equipeNome.replace(/'/g,"&apos;")}','injetores')">+ Lançar entrega de injetores</button>
+      ${lancHtml ? `<div style="margin-top:8px;"><div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:4px;">Últimos lançamentos</div>${lancHtml}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function _gestaoRenderPrevisao() {
+  const equipes = (_gestaoState.estoque?.equipes || []);
+  if (!equipes.length) return '<div style="text-align:center;color:#888;padding:24px;">Sem dados.</div>';
+  return equipes.map(eq => `
+    <div class="gestao-card">
+      <div class="gestao-eq-nome">${eq.equipeNome}</div>
+      <div class="gestao-stat-grid">
+        <div class="gestao-stat" style="background:#e0e7ff;">
+          <div class="gestao-stat-val" style="color:#4338ca;">${_gestaoFmt(eq.disponivel)} L</div>
+          <div class="gestao-stat-lbl" style="color:#4338ca;">Disponível</div>
+        </div>
+        <div class="gestao-stat" style="background:#fef9c3;">
+          <div class="gestao-stat-val" style="color:#854d0e;">${_gestaoFmt(eq.consumidoPrevisto)} L</div>
+          <div class="gestao-stat-lbl" style="color:#854d0e;">Previsto</div>
+        </div>
+        <div class="gestao-stat" style="background:#dcfce7;">
+          <div class="gestao-stat-val" style="color:#166534;">${_gestaoFmt(eq.consumido)} L</div>
+          <div class="gestao-stat-lbl" style="color:#166534;">Consumido</div>
+        </div>
+      </div>
+      ${eq.riscoFalta ? `<div class="gestao-divergente">⚠️ Pode faltar ${_gestaoFmt(eq.faltaPrevista)} L nesta semana</div>` : ''}
+    </div>
+  `).join('');
+}
+
+function _gestaoRenderAgenda() {
+  const equipes = (_gestaoState.agenda?.equipes || []);
+  if (!equipes.length) return '<div style="text-align:center;color:#888;padding:24px;">Sem dados.</div>';
+  return equipes.map(eq => {
+    if (!eq.oses?.length) return `<div class="gestao-card"><div class="gestao-eq-nome">${eq.equipeNome}</div><div style="color:#9ca3af;font-style:italic;">Sem OS nesta semana</div></div>`;
+    const osesHtml = eq.oses.map(os => `
+      <div class="gestao-os-card" style="border-left-color:${eq.cor || '#888'};">
+        <div style="font-weight:700;font-size:14px;color:#1f2937;">#${String(os.numero||'?').padStart(3,'0')} ${os.cliente || '—'}</div>
+        <div style="font-size:12px;color:#6b7280;margin-top:2px;">📍 ${[os.bairro, os.cidade].filter(Boolean).join(', ') || '—'}</div>
+        <div style="font-size:11px;color:#6b7280;margin-top:4px;display:flex;gap:8px;flex-wrap:wrap;">
+          <span>📅 ${os.dataInicio || '?'}${os.dataTermino && os.dataTermino !== os.dataInicio ? ' → ' + os.dataTermino : ''}</span>
+          ${os.consumoProduto ? `<span>📦 ${_gestaoFmt(os.consumoProduto)} L estimados</span>` : ''}
+        </div>
+      </div>`).join('');
+    return `<div class="gestao-card"><div class="gestao-eq-nome" style="color:${eq.cor || '#1f2937'};">${eq.equipeNome}</div>${osesHtml}</div>`;
+  }).join('');
+}
+
+async function _gestaoLancarFornec(equipeId, equipeNome, tipo) {
+  const unidade = tipo === 'produto' ? 'L' : 'unid';
+  const v = prompt(`Quantos ${unidade} você deu pra ${equipeNome}?`);
+  if (v == null) return;
+  const qtd = parseFloat(v.replace(',', '.'));
+  if (isNaN(qtd) || qtd <= 0) { alert('Valor inválido'); return; }
+  const token = getStoredToken();
+  const PANEL_BASE = WEBHOOK_URL.replace('/api/medicao', '');
+  try {
+    const r = await fetch(`${PANEL_BASE}/api/encarregado/fornecimento`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+      body: JSON.stringify({ semana: _gestaoState.semana, equipeId, tipo, quantidade: qtd })
+    });
+    if (!r.ok) { const e = await r.json().catch(() => ({})); alert('Erro: ' + (e.error || r.status)); return; }
+    await _gestaoCarregar();
+  } catch (e) { alert('Erro de rede: ' + e.message); }
+}
+
+async function _gestaoExcluirFornec(id) {
+  if (!confirm('Excluir este lançamento?')) return;
+  const token = getStoredToken();
+  const PANEL_BASE = WEBHOOK_URL.replace('/api/medicao', '');
+  try {
+    const r = await fetch(`${PANEL_BASE}/api/encarregado/fornecimento/${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: 'Bearer ' + token }
+    });
+    if (!r.ok) { alert('Erro ao excluir'); return; }
+    await _gestaoCarregar();
+  } catch (e) { alert('Erro: ' + e.message); }
 }
 
 // Abre tela de criação. Se passar uma visita existente, abre em modo edição.
@@ -2063,7 +2366,34 @@ function deleteMeasurement(id) {
 // ══════════════════════════════════════════════
 // HOME
 // ══════════════════════════════════════════════
+// ── Devocional diário: mostra modal com versículo na 1ª abertura do dia ─────
+async function mostrarVersiculoDoDia() {
+  try {
+    const hoje = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
+    const chave = `vf_versiculo_visto_${hoje}`;
+    if (localStorage.getItem(chave)) return; // já viu hoje
+    const PANEL_BASE = WEBHOOK_URL.replace('/api/medicao', '');
+    const r = await fetch(`${PANEL_BASE}/api/devocional/hoje`);
+    if (!r.ok) return;
+    const v = await r.json();
+    document.getElementById('devocional-texto').textContent = '"' + v.texto + '"';
+    document.getElementById('devocional-ref').textContent = '— ' + v.referencia;
+    document.getElementById('screen-devocional').style.display = 'flex';
+  } catch (e) { /* falha silenciosa — não atrapalha o app */ }
+}
+function fecharDevocional() {
+  const hoje = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
+  localStorage.setItem(`vf_versiculo_visto_${hoje}`, '1');
+  const el = document.getElementById('screen-devocional');
+  el.style.transition = 'opacity 0.4s ease';
+  el.style.opacity = '0';
+  setTimeout(() => { el.style.display = 'none'; el.style.opacity = '1'; el.style.transition = ''; }, 420);
+}
+
 function showHome() {
+  // Devocional diário: aparece na primeira vez do dia (não bloqueia o resto)
+  mostrarVersiculoDoDia();
+
   // Renova sessão a cada abertura da home (sliding expiry — mantém logado enquanto usa o app)
   try {
     const stored = JSON.parse(localStorage.getItem('vf_user') || '{}');
@@ -2296,7 +2626,8 @@ async function sendMeasurement(measurement, onAttempt) {
       return false;
     }
   } else {
-    // Dispara o POST sem esperar resposta (pode travar no iOS com SW antigo)
+    // Dispara o POST sem esperar resposta — confirma via GET /ping logo abaixo.
+    // Aguardar await em POST com body grande trava no iOS e em alguns Android.
     fetch(WEBHOOK_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -2304,9 +2635,11 @@ async function sendMeasurement(measurement, onAttempt) {
     }).catch(() => {});
   }
 
-  // Verifica a cada 3s se o servidor recebeu (GET nunca trava)
-  for (let i = 0; i < 20; i++) {
-    await new Promise(r => setTimeout(r, 3000));
+  // Verifica a cada 2s se o servidor recebeu (até ~20s = 10 tentativas).
+  // Ao primeiro found=true, retorna sucesso imediato.
+  for (let i = 0; i < 10; i++) {
+    if (onAttempt) onAttempt(i + 1, 10);
+    await new Promise(r => setTimeout(r, 2000));
     try {
       const r = await fetch(`${PANEL_BASE}/api/medicao/${measurement.id}/ping`);
       const d = await r.json();
@@ -2407,16 +2740,10 @@ function editarFotosMedicao(id) {
 function openForm(step) {
   currentStep = step;
   sessionStorage.setItem('vf_current_measurement', JSON.stringify(currentMeasurement));
-  // Liga autosave em qualquer input/change/click dentro da tela do formulário (uma vez só)
-  const fmEl = document.getElementById('screen-form');
-  if (fmEl && !fmEl.dataset.autosaveBound) {
-    ['input', 'change', 'click'].forEach(evt => {
-      fmEl.addEventListener(evt, () => scheduleAutosave(), true);
-    });
-    fmEl.dataset.autosaveBound = '1';
-  }
-  // Auto-save imediato ao abrir o formulário
-  scheduleAutosave();
+  // AUTOSAVE DESATIVADO temporariamente — estava causando race condition com o CONCLUIR
+  // (autosave rodava em paralelo durante o envio e reescrevia o status pra 'incompleto',
+  // confundindo o medidor que via medição enviada como "PENDENTE DE ENVIO").
+  // Reativar só depois de garantir isolamento total entre os dois fluxos.
   // Reset step 1 fields
   document.getElementById('f-cliente').value = currentMeasurement.cliente || '';
   document.getElementById('f-endereco').value = currentMeasurement.endereco || '';
@@ -2452,8 +2779,7 @@ function openForm(step) {
 // ══════════════════════════════════════════════
 function goToStep(n) {
   currentStep = n;
-  // Auto-save ao trocar de step (garante que a transição grava o estado)
-  scheduleAutosave();
+  // Autosave desativado (vide nota em openForm).
   document.querySelectorAll('.form-step').forEach((el, i) => {
     el.classList.toggle('active', i + 1 === n);
   });
@@ -3166,9 +3492,16 @@ function saveDraft() {
 // Aparece na home como pendente, com tag INCOMPLETO + RASCUNHO.
 // Se o usuário sair do app/atender ligação, basta clicar no card pra continuar.
 let _autosaveTimer = null;
+// FLAG GLOBAL: vira true enquanto concluir() está enviando.
+// Sem isso, o autosave roda em paralelo durante o envio e reescreve o status
+// 'sent' de volta para 'incompleto' (race condition que confundia o usuário —
+// medição chegava no servidor mas ficava como "PENDENTE DE ENVIO" no PWA).
+let _sendingMeasurement = false;
 function scheduleAutosave() {
   if (_autosaveTimer) clearTimeout(_autosaveTimer);
   _autosaveTimer = setTimeout(() => {
+    // Não roda autosave durante envio ativo
+    if (_sendingMeasurement) return;
     if (!currentMeasurement || !currentMeasurement.id) return;
     // Não salva se a medição não tem nem nome do cliente (vazia)
     if (!currentMeasurement.cliente && (!currentMeasurement.locais || currentMeasurement.locais.length === 0)) return;
@@ -3178,8 +3511,8 @@ function scheduleAutosave() {
       const arr = getMeasurements();
       const idx = arr.findIndex(m => m.id === currentMeasurement.id);
       const existing = idx >= 0 ? arr[idx] : null;
-      // Se a medição já foi enviada, não sobrescreve
-      if (existing && existing.status === 'sent') return;
+      // Se a medição já foi enviada ou está pendente de envio confirmado, não sobrescreve
+      if (existing && (existing.status === 'sent' || existing.status === 'pending')) return;
       // Mantém status 'draft' se o usuário já tinha salvo manualmente; senão marca como incompleto
       const novoStatus = (existing && existing.status === 'draft') ? 'draft' : 'incompleto';
       const snapshot = {
@@ -3206,18 +3539,23 @@ function checkAutosave() {
   localStorage.removeItem('vf_autosave_legacy');
 }
 
-function concluir() {
+// CONCLUIR = ENVIAR. Função simples e direta:
+//   1) Coleta os dados do Step 3
+//   2) Tenta enviar via sendMeasurement (POST fire-and-forget + ping a cada 2s)
+//   3) Sucesso → status 'sent' + tela de sucesso
+//      Falha   → status 'pending' + home com aviso (botão "Enviar agora" reaparece)
+//      Offline → status 'pending' + home (background sync envia ao voltar online)
+async function concluir() {
+  // ── Coleta os dados do form ──────────────────────────────────────────────
   collectLocations();
-  // Coleta todos os campos do Step 3 antes de salvar
   const obsEl = document.getElementById('f-obs');
   if (obsEl) currentMeasurement.obs = obsEl.value.trim();
-  // Coleta andaime
   const andaimeInput = document.querySelector('input[name="andaime"]:checked');
   currentMeasurement.andaime = andaimeInput ? andaimeInput.value : 'nao';
   if (currentMeasurement.andaime === 'sim') {
-    currentMeasurement.andaimeMetros = parseFloat(document.getElementById('f-andaime-metros').value) || 0;
-    currentMeasurement.andaimeRodinhas = document.getElementById('f-andaime-rodinhas').checked;
-    currentMeasurement.andaimeBases = document.getElementById('f-andaime-bases').checked;
+    currentMeasurement.andaimeMetros = parseFloat(document.getElementById('f-andaime-metros')?.value) || 0;
+    currentMeasurement.andaimeRodinhas = !!document.getElementById('f-andaime-rodinhas')?.checked;
+    currentMeasurement.andaimeBases = !!document.getElementById('f-andaime-bases')?.checked;
     const larguraInput = document.querySelector('input[name="andaime-largura"]:checked');
     currentMeasurement.andaimeLargura = larguraInput ? larguraInput.value : '1m';
   } else {
@@ -3226,15 +3564,54 @@ function concluir() {
     currentMeasurement.andaimeBases = false;
     currentMeasurement.andaimeLargura = '1m';
   }
-  // Coleta garantia
   const garantiaInput = document.querySelector('input[name="garantia"]:checked');
   currentMeasurement.garantia = garantiaInput ? garantiaInput.value : '15';
-  currentMeasurement.status = 'draft';
-  upsertMeasurement(currentMeasurement);
-  // Autosave persistiu no draft oficial — pode descartar
+
+  // ── Limpa qualquer restos do autosave antigo ────────────────────────────
   localStorage.removeItem('vf_autosave');
-  showToast('Medição salva! Use "Enviar agora" para enviar.', 'success');
-  showHome();
+
+  // ── Encontra o botão CONCLUIR pra atualizar feedback ────────────────────
+  const cb = document.querySelector('.btn-concluir');
+  const setBtn = (txt, dis) => { if (cb) { cb.textContent = txt; cb.disabled = !!dis; } };
+
+  // ── Offline: marca pending e volta pra home (envia depois) ──────────────
+  if (!navigator.onLine) {
+    currentMeasurement.status = 'pending';
+    upsertMeasurement(currentMeasurement);
+    showToast('📡 Sem conexão. Será enviada quando voltar online.', 'info');
+    showHome();
+    return;
+  }
+
+  // ── Envia ─────────────────────────────────────────────────────────────────
+  setBtn('⏳ Enviando...', true);
+  let ok = false;
+  try {
+    ok = await sendMeasurement(currentMeasurement, (i, total) => {
+      setBtn(`⏳ Enviando... (${i}/${total})`, true);
+    });
+  } catch (e) {
+    console.error('concluir/sendMeasurement error:', e);
+  }
+  setBtn('✓ CONCLUIR', false);
+
+  if (ok) {
+    currentMeasurement.status = 'sent';
+    upsertMeasurement(currentMeasurement);
+    if (currentMeasurement.calendarEventId) {
+      try { markCalendarEventDone(currentMeasurement.calendarEventId); } catch {}
+    }
+    showSuccessScreen(currentMeasurement);
+  } else {
+    // Não conseguimos CONFIRMAR via ping em 20s, mas o POST já foi disparado.
+    // O servidor pode receber a medição mesmo depois (Vercel cold start + Mongo).
+    // Marcamos pending pra dar opção de reenviar — se já chegou, o reenvio é idempotente
+    // (cria/atualiza pelo mesmo id) e fica como duplicata na pior das hipóteses.
+    currentMeasurement.status = 'pending';
+    upsertMeasurement(currentMeasurement);
+    showToast('⚠️ Servidor demorou para confirmar. A medição pode já ter sido enviada — verifique no painel. Se não chegou, clique em "Enviar agora" no card.', 'warning');
+    showHome();
+  }
 }
 
 async function submitMeasurement() {
